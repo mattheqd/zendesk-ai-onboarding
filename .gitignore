@@ -1,0 +1,10 @@
+# Test files
+.zendesk_ai_gateway_token_temp
+*.log
+
+# macOS
+.DS_Store
+
+# Backup files
+*.bak
+*~

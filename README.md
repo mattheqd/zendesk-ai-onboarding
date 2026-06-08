@@ -1,0 +1,191 @@
+# Zendesk Claude Code Workshop - Onboarding Scripts
+
+Automated setup scripts to get Zendesk designers ready for the Claude Code workshop in ~10 minutes.
+
+## 🧙 Interactive Setup Wizard (Recommended)
+
+**One command to rule them all:**
+
+```bash
+bash setup-wizard.sh
+```
+
+The wizard will guide you through:
+1. ✓ VPN connection check
+2. ✓ GitHub access verification
+3. ✓ AI Gateway token setup (opens browser for you!)
+4. ✓ Tool installation (Homebrew, Node, VS Code, etc.)
+5. ✓ Claude Code installation
+6. ✓ Final verification
+
+**Features:**
+- 🎨 Clean, designer-friendly interface
+- ↩️ Retry options if something fails
+- 🌐 Opens browser to get your token
+- 📋 Clear instructions for GitHub access
+- ✅ Validates everything at the end
+
+---
+
+## 🔧 Advanced: Two-Phase Setup (Alternative)
+
+If you prefer more control, use the two-phase approach:
+
+```bash
+bash preflight.sh && bash install.sh
+```
+
+### Phase 1: preflight.sh (Checks Only)
+- ✓ GlobalProtect VPN connectivity
+- ✓ GitHub CLI + zendesk org membership
+- ✓ AI Gateway token validation
+
+### Phase 2: install.sh (Installations)
+- Homebrew (if missing)
+- Node.js 20+
+- GitHub CLI (gh) + authentication
+- VS Code
+- Superwhisper
+- Claude Code (via AI Gateway)
+
+---
+
+## Requirements
+
+- **Mac** (macOS 10.15+)
+- **GlobalProtect VPN** connected
+- **Zendesk email** for GitHub access
+- **AI Gateway token** from https://ai-gateway.zende.sk
+
+---
+
+## Troubleshooting
+
+### VPN Issues
+- Open GlobalProtect and connect before running scripts
+- The AI Gateway should be reachable at https://ai-gateway.zende.sk
+
+### GitHub Access
+**If you see warnings about GitHub access:**
+1. Ping your manager or **#it-help** on Slack
+2. Ask to be added to the **Zendesk GitHub organization**
+3. This takes ~15 minutes if you ask today, 2 days if you wait
+
+**You'll need this to push to internal repos during the workshop.**
+
+### Token Issues
+- Get a fresh token from https://ai-gateway.zende.sk
+- Token should start with `zdai_`
+- Make sure you're logged in with your Zendesk credentials
+
+### Install Failures
+- Check your internet connection
+- Some tools may require admin approval on first launch
+- Contact workshop organizers if problems persist
+
+---
+
+## Manual Testing
+
+### Test with Dry Run (Safe - No Changes)
+```bash
+DRY_RUN=1 bash install.sh
+```
+
+### Test Preflight Only
+```bash
+bash preflight.sh
+```
+
+### Test Individual Components
+```bash
+# Test VPN
+curl -I https://ai-gateway.zende.sk
+
+# Test GitHub org
+gh api /user/orgs | grep zendesk
+
+# Test token validation
+curl -I https://ai-gateway.zende.sk/bedrock/v1/messages \
+  -H "Authorization: Bearer zdai_YOUR_TOKEN"
+```
+
+See [TESTING.md](TESTING.md) for comprehensive testing guide.
+
+---
+
+## Time Estimates
+
+- **Interactive Wizard**: ~10 minutes (fully guided)
+- **Two-Phase Setup**: ~10 minutes (more manual)
+- **Manual Setup**: ~45 minutes (what we're replacing!)
+
+---
+
+## What Gets Installed
+
+| Tool | Purpose | Size |
+|------|---------|------|
+| **Homebrew** | Package manager for Mac | ~100 MB |
+| **Node.js 20+** | JavaScript runtime (required by Claude Code) | ~50 MB |
+| **GitHub CLI** | Command-line tool for GitHub | ~15 MB |
+| **jq** | JSON processor (for config updates) | ~1 MB |
+| **VS Code** | Code editor for the workshop | ~150 MB |
+| **Superwhisper** | Voice-to-text tool | ~50 MB |
+| **Claude Code** | AI coding assistant | ~30 MB |
+
+**Total:** ~400 MB (plus download time)
+
+---
+
+## After Installation
+
+### Start Claude Code
+```bash
+# Open a new terminal first (to load updated PATH)
+claude
+```
+
+### Verify Installation
+```bash
+# Check versions
+claude --version
+gh --version
+node --version
+
+# Check Claude Code config
+cat ~/.claude/settings.json | jq .
+
+# Test AI Gateway connectivity
+curl -I https://ai-gateway.zende.sk
+```
+
+---
+
+## Support
+
+**During the workshop:**
+- Ask the workshop organizers for help
+
+**Before the workshop:**
+- For GitHub access: Ping **#it-help** on Slack
+- For VPN issues: Contact IT
+- For script issues: Contact the workshop organizers
+
+---
+
+## Files in This Repo
+
+- **`setup-wizard.sh`** - Interactive setup wizard (recommended)
+- **`preflight.sh`** - Validation checks only
+- **`install.sh`** - Installation phase
+- **`README.md`** - This file
+- **`TESTING.md`** - Testing guide for organizers
+
+---
+
+## Quick Links
+
+- 🔑 Get AI Gateway token: https://ai-gateway.zende.sk
+- 🐙 Zendesk GitHub org: https://github.com/zendesk
+- 💬 IT support: #it-help on Slack
