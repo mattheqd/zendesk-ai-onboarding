@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zendesk Claude Code Workshop - Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .emoji {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .setup-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .setup-box h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .command-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 20px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-box code {
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+
+        .copy-btn:active {
+            background: #4451a8;
+        }
+
+        .copy-btn.copied {
+            background: #28a745;
+        }
+
+        .step {
+            margin: 30px 0;
+            padding: 20px;
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step h3 {
+            display: inline-block;
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            margin-left: 42px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .warning-box h3::before {
+            content: "⚠️";
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .info-box h3 {
+            color: #0c5460;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-box h3::before {
+            content: "🔑";
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .checklist {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .checklist li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .timeline {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .timeline h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            align-items: flex-start;
+        }
+
+        .timeline-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 15px;
+            white-space: nowrap;
+        }
+
+        .troubleshooting {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .troubleshooting h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .trouble-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #dc3545;
+        }
+
+        .trouble-item strong {
+            color: #dc3545;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .trouble-item p {
+            color: #666;
+            margin-left: 0;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .step p {
+                margin-left: 0;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+            }
+
+            .timeline-badge {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="emoji">🚀</div>
+            <h1>Claude Code Workshop</h1>
+            <p>Get your Mac ready in ~10 minutes</p>
+        </div>
+
+        <div class="content">
+            <div class="setup-box">
+                <h2>Quick Setup (Copy & Paste)</h2>
+                <p>Open <strong>Terminal</strong> and run this command:</p>
+                <div class="command-box">
+                    <button class="copy-btn" onclick="copyCommand()">Copy</button>
+                    <code id="setup-command">bash &lt;(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)</code>
+                </div>
+                <p style="margin-top: 10px;"><small>⚠️ Make sure <strong>GlobalProtect VPN</strong> is connected first!</small></p>
+            </div>
+
+            <div class="warning-box">
+                <h3>Important: GitHub Access Required</h3>
+                <p>If you're not already in the <strong>zendesk GitHub org</strong>, you need access to push code during the workshop.</p>
+                <p style="margin-top: 15px;"><strong>Action now:</strong> Ping <strong>#it-help</strong> on Slack and say:</p>
+                <div class="command-box" style="margin-top: 15px;">
+                    <button class="copy-btn" onclick="copySlackMessage()">Copy</button>
+                    <code id="slack-message">"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"</code>
+                </div>
+                <p style="margin-top: 15px;">⏰ This takes <strong>~15 minutes</strong> if you ask today, but <strong>2 days</strong> if you wait until the workshop day!</p>
+            </div>
+
+            <div class="timeline">
+                <h3>Setup Timeline</h3>
+                <div class="timeline-item">
+                    <div class="timeline-badge">Step 1</div>
+                    <div>
+                        <strong>VPN Check</strong>
+                        <p>Verify GlobalProtect connection</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">Step 2</div>
+                    <div>
+                        <strong>GitHub Access</strong>
+                        <p>Validate org membership</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">Step 3</div>
+                    <div>
+                        <strong>AI Gateway Token</strong>
+                        <p>Browser opens automatically to help you get it</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">Step 4</div>
+                    <div>
+                        <strong>Install Tools</strong>
+                        <p>Homebrew, Node.js, GitHub CLI, VS Code (~5-10 min)</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">Step 5</div>
+                    <div>
+                        <strong>Claude Code</strong>
+                        <p>Download and configure</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">Done! ✓</div>
+                    <div>
+                        <strong>Ready for Workshop</strong>
+                        <p>Total time: ~10 minutes</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>Getting Your AI Gateway Token</h3>
+                <p>The wizard will help you with this, but here's the flow:</p>
+                <ul class="checklist">
+                    <li>Open <a href="https://ai-gateway.zende.sk" target="_blank">https://ai-gateway.zende.sk</a></li>
+                    <li>Log in with your Zendesk credentials</li>
+                    <li>Copy your API token (starts with <code>zdai_</code>)</li>
+                    <li>Paste it into the wizard when prompted</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <h3>Before You Start</h3>
+                <p>Make sure you have:</p>
+                <ul class="checklist" style="margin-left: 42px; margin-top: 10px;">
+                    <li>GlobalProtect VPN connected</li>
+                    <li>Zendesk email (for GitHub access)</li>
+                    <li>10 minutes of uninterrupted time</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <h3>During Setup</h3>
+                <p>The wizard will:</p>
+                <ul class="checklist" style="margin-left: 42px; margin-top: 10px;">
+                    <li>Check your VPN connection</li>
+                    <li>Verify GitHub access (and tell you how to get it if needed)</li>
+                    <li>Open browser to get your AI Gateway token</li>
+                    <li>Install all required tools automatically</li>
+                    <li>Set up Claude Code with your token</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <h3>What Gets Installed</h3>
+                <p>The wizard installs everything you need:</p>
+                <ul class="checklist" style="margin-left: 42px; margin-top: 10px;">
+                    <li>Homebrew (Mac package manager)</li>
+                    <li>Node.js 20+</li>
+                    <li>GitHub CLI</li>
+                    <li>VS Code</li>
+                    <li>Claude Code</li>
+                </ul>
+                <p style="margin-left: 42px; margin-top: 10px;"><small>Total size: ~350 MB</small></p>
+            </div>
+
+            <div class="troubleshooting">
+                <h3>❓ Troubleshooting</h3>
+
+                <div class="trouble-item">
+                    <strong>"Cannot reach ai-gateway.zende.sk"</strong>
+                    <p>→ Connect to GlobalProtect VPN first</p>
+                </div>
+
+                <div class="trouble-item">
+                    <strong>"Token doesn't look right"</strong>
+                    <p>→ Make sure it starts with <code>zdai_</code> and has no extra spaces</p>
+                </div>
+
+                <div class="trouble-item">
+                    <strong>"Not a member of zendesk org"</strong>
+                    <p>→ See the GitHub Access section above - ping #it-help on Slack</p>
+                </div>
+
+                <div class="trouble-item">
+                    <strong>GitHub authentication fails</strong>
+                    <p>→ Choose "GitHub.com", "HTTPS", and "Login with web browser"</p>
+                </div>
+
+                <div class="trouble-item">
+                    <strong>Other issues?</strong>
+                    <p>→ Contact workshop organizers or ping #it-help</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="https://github.com/mattheqd/zendesk-ai-onboarding" class="btn" target="_blank">📚 View Full Documentation</a>
+                <a href="https://github.com/mattheqd/zendesk-ai-onboarding/blob/main/QUICKSTART.md" class="btn btn-secondary" target="_blank">Quick Start Guide</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Need help?</strong></p>
+            <p>Ping <strong>#it-help</strong> on Slack or contact the workshop organizers</p>
+            <p style="margin-top: 20px;">
+                <a href="https://github.com/mattheqd/zendesk-ai-onboarding" target="_blank">GitHub Repo</a> •
+                <a href="https://ai-gateway.zende.sk" target="_blank">AI Gateway</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function copyCommand() {
+            const command = 'bash <(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)';
+            navigator.clipboard.writeText(command).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function copySlackMessage() {
+            const message = '"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"';
+            navigator.clipboard.writeText(message).then(() => {
+                const btns = document.querySelectorAll('.copy-btn');
+                const btn = btns[1]; // Second copy button
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
