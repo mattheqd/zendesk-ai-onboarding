@@ -24,6 +24,9 @@ INSTALL_SUCCESS=true
 AI_GATEWAY_TOKEN=""
 TOKEN_FILE="$HOME/.zendesk_ai_gateway_token_temp"
 
+# Track failed installations
+FAILED_INSTALLS=()
+
 # Helper functions
 show_header() {
     clear
@@ -260,7 +263,6 @@ step_install_tools() {
     echo "  • GitHub CLI"
     echo "  • jq (JSON processor)"
     echo "  • VS Code"
-    echo "  • Superwhisper"
     echo ""
     echo "This takes about 5-10 minutes depending on your internet."
     echo ""
@@ -272,14 +274,15 @@ step_install_tools() {
     echo -e "${YELLOW}⏳ Checking Homebrew...${NC}"
     if ! command -v brew &> /dev/null; then
         echo "  Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || {
+        if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+            # Add brew to PATH for Apple Silicon
+            if [[ $(uname -m) == "arm64" ]]; then
+                eval "$(/opt/homebrew/bin/brew shellenv)"
+            fi
+        else
             echo -e "${RED}✗ Homebrew installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
-
-        # Add brew to PATH for Apple Silicon
-        if [[ $(uname -m) == "arm64" ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
+            FAILED_INSTALLS+=("Homebrew")
         fi
     else
         echo -e "${GREEN}✓ Homebrew already installed${NC}"
@@ -290,10 +293,13 @@ step_install_tools() {
     echo -e "${YELLOW}⏳ Checking jq...${NC}"
     if ! command -v jq &> /dev/null; then
         echo "  Installing jq..."
-        brew install jq || {
+        if brew install jq; then
+            echo -e "${GREEN}✓ jq installed${NC}"
+        else
             echo -e "${RED}✗ jq installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("jq")
+        fi
     else
         echo -e "${GREEN}✓ jq already installed${NC}"
     fi
@@ -303,20 +309,24 @@ step_install_tools() {
     echo -e "${YELLOW}⏳ Checking Node.js...${NC}"
     if ! command -v node &> /dev/null; then
         echo "  Installing Node.js 20..."
-        brew install node@20 || {
+        if brew install node@20 && brew link --force node@20; then
+            echo -e "${GREEN}✓ Node.js installed${NC}"
+        else
             echo -e "${RED}✗ Node.js installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
-        brew link --force node@20 || true
+            FAILED_INSTALLS+=("Node.js")
+        fi
     else
         NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
         if [ "$NODE_VERSION" -lt 20 ]; then
             echo "  Upgrading Node.js to version 20..."
-            brew install node@20 || {
+            if brew install node@20 && brew link --force node@20; then
+                echo -e "${GREEN}✓ Node.js upgraded${NC}"
+            else
                 echo -e "${RED}✗ Node.js upgrade failed${NC}"
                 INSTALL_SUCCESS=false
-            }
-            brew link --force node@20 || true
+                FAILED_INSTALLS+=("Node.js upgrade")
+            fi
         else
             echo -e "${GREEN}✓ Node.js 20+ already installed${NC}"
         fi
@@ -327,10 +337,13 @@ step_install_tools() {
     echo -e "${YELLOW}⏳ Checking GitHub CLI...${NC}"
     if ! command -v gh &> /dev/null; then
         echo "  Installing GitHub CLI..."
-        brew install gh || {
+        if brew install gh; then
+            echo -e "${GREEN}✓ GitHub CLI installed${NC}"
+        else
             echo -e "${RED}✗ GitHub CLI installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("GitHub CLI")
+        fi
     else
         echo -e "${GREEN}✓ GitHub CLI already installed${NC}"
     fi
@@ -340,10 +353,11 @@ step_install_tools() {
         echo ""
         echo -e "${BLUE}Let's connect your GitHub account...${NC}"
         echo ""
-        gh auth login || {
+        if ! gh auth login; then
             echo -e "${RED}✗ GitHub authentication failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("GitHub authentication")
+        fi
     fi
 
     # Install VS Code
@@ -351,25 +365,15 @@ step_install_tools() {
     echo -e "${YELLOW}⏳ Checking VS Code...${NC}"
     if [ ! -d "/Applications/Visual Studio Code.app" ]; then
         echo "  Installing VS Code..."
-        brew install --cask visual-studio-code || {
+        if brew install --cask visual-studio-code; then
+            echo -e "${GREEN}✓ VS Code installed${NC}"
+        else
             echo -e "${RED}✗ VS Code installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("VS Code")
+        fi
     else
         echo -e "${GREEN}✓ VS Code already installed${NC}"
-    fi
-
-    # Install Superwhisper
-    echo ""
-    echo -e "${YELLOW}⏳ Checking Superwhisper...${NC}"
-    if [ ! -d "/Applications/Superwhisper.app" ]; then
-        echo "  Installing Superwhisper..."
-        brew install --cask superwhisper || {
-            echo -e "${RED}✗ Superwhisper installation failed${NC}"
-            INSTALL_SUCCESS=false
-        }
-    else
-        echo -e "${GREEN}✓ Superwhisper already installed${NC}"
     fi
 
     echo ""
@@ -427,6 +431,7 @@ EOF
             echo ""
             echo -e "${RED}✗ Claude Code installation failed${NC}"
             INSTALL_SUCCESS=false
+            FAILED_INSTALLS+=("Claude Code")
         fi
     else
         echo -e "${GREEN}✓ Claude Code already installed${NC}"
@@ -511,8 +516,20 @@ step_final_check() {
         echo ""
         echo "See you at the workshop!"
     else
-        echo -e "${RED}Some installations had issues.${NC}"
-        echo "Please contact the workshop organizers for help."
+        echo -e "${RED}${BOLD}⚠️  Some installations failed${NC}"
+        echo ""
+        echo "The following components had issues:"
+        for failed in "${FAILED_INSTALLS[@]}"; do
+            echo -e "  ${RED}✗ $failed${NC}"
+        done
+        echo ""
+        echo "Common fixes:"
+        echo "  • Check your internet connection"
+        echo "  • Make sure you have enough disk space"
+        echo "  • Try running the wizard again"
+        echo ""
+        echo "If problems persist, contact the workshop organizers with"
+        echo "the specific error messages shown above."
     fi
 
     echo ""

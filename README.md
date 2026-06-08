@@ -58,7 +58,6 @@ bash preflight.sh && bash install.sh
 - Node.js 20+
 - GitHub CLI (gh) + authentication
 - VS Code
-- Superwhisper
 - Claude Code (via AI Gateway)
 
 ---
@@ -144,10 +143,9 @@ See [TESTING.md](TESTING.md) for comprehensive testing guide.
 | **GitHub CLI** | Command-line tool for GitHub | ~15 MB |
 | **jq** | JSON processor (for config updates) | ~1 MB |
 | **VS Code** | Code editor for the workshop | ~150 MB |
-| **Superwhisper** | Voice-to-text tool | ~50 MB |
 | **Claude Code** | AI coding assistant | ~30 MB |
 
-**Total:** ~400 MB (plus download time)
+**Total:** ~350 MB (plus download time)
 
 ---
 

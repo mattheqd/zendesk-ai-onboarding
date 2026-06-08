@@ -49,11 +49,10 @@ The wizard installs everything you need:
 - ✓ Node.js 20+
 - ✓ GitHub CLI
 - ✓ VS Code
-- ✓ Superwhisper
 - ✓ Claude Code
 
 **Total time: ~10 minutes**  
-**Total size: ~400 MB**
+**Total size: ~350 MB**
 
 ---
 

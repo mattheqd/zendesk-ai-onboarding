@@ -41,6 +41,7 @@ AI_GATEWAY_TOKEN=$(cat "$TOKEN_FILE")
 
 # Track installation status
 INSTALL_SUCCESS=true
+FAILED_INSTALLS=()
 
 # Install Homebrew if missing
 echo -e "${YELLOW}⏳ Checking Homebrew...${NC}"
@@ -49,14 +50,15 @@ if ! command -v brew &> /dev/null; then
         echo "  [DRY RUN] Would install Homebrew"
     else
         echo "  Installing Homebrew (this may take a few minutes)..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || {
+        if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+            # Add brew to PATH for Apple Silicon Macs
+            if [[ $(uname -m) == "arm64" ]]; then
+                eval "$(/opt/homebrew/bin/brew shellenv)"
+            fi
+        else
             echo -e "${RED}✗ Homebrew installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
-
-        # Add brew to PATH for Apple Silicon Macs
-        if [[ $(uname -m) == "arm64" ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
+            FAILED_INSTALLS+=("Homebrew")
         fi
     fi
 else
@@ -71,10 +73,11 @@ if ! command -v jq &> /dev/null; then
         echo "  [DRY RUN] Would install jq"
     else
         echo "  Installing jq..."
-        brew install jq || {
+        if ! brew install jq; then
             echo -e "${RED}✗ jq installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("jq")
+        fi
     fi
 else
     echo -e "${GREEN}✓ jq already installed${NC}"
@@ -88,11 +91,13 @@ if ! command -v node &> /dev/null; then
         echo "  [DRY RUN] Would install Node.js 20"
     else
         echo "  Installing Node.js 20..."
-        brew install node@20 || {
+        if brew install node@20 && brew link --force node@20; then
+            echo -e "${GREEN}✓ Node.js installed${NC}"
+        else
             echo -e "${RED}✗ Node.js installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
-        brew link --force node@20 || true
+            FAILED_INSTALLS+=("Node.js")
+        fi
     fi
 else
     NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
@@ -101,11 +106,13 @@ else
             echo "  [DRY RUN] Would upgrade Node.js to version 20"
         else
             echo "  Upgrading Node.js to version 20..."
-            brew install node@20 || {
+            if brew install node@20 && brew link --force node@20; then
+                echo -e "${GREEN}✓ Node.js upgraded${NC}"
+            else
                 echo -e "${RED}✗ Node.js upgrade failed${NC}"
                 INSTALL_SUCCESS=false
-            }
-            brew link --force node@20 || true
+                FAILED_INSTALLS+=("Node.js upgrade")
+            fi
         fi
     else
         echo -e "${GREEN}✓ Node.js 20+ already installed${NC}"
@@ -120,10 +127,11 @@ if ! command -v gh &> /dev/null; then
         echo "  [DRY RUN] Would install GitHub CLI"
     else
         echo "  Installing GitHub CLI..."
-        brew install gh || {
+        if ! brew install gh; then
             echo -e "${RED}✗ GitHub CLI installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("GitHub CLI")
+        fi
     fi
 else
     echo -e "${GREEN}✓ GitHub CLI already installed${NC}"
@@ -134,10 +142,11 @@ if [ "$DRY_RUN" != "1" ] && command -v gh &> /dev/null && ! gh auth status &> /d
     echo ""
     echo -e "${BLUE}Let's connect your GitHub account...${NC}"
     echo ""
-    gh auth login || {
+    if ! gh auth login; then
         echo -e "${RED}✗ GitHub authentication failed${NC}"
         INSTALL_SUCCESS=false
-    }
+        FAILED_INSTALLS+=("GitHub authentication")
+    fi
 elif [ "$DRY_RUN" = "1" ] && ! gh auth status &> /dev/null 2>&1; then
     echo "  [DRY RUN] Would prompt for GitHub authentication"
 fi
@@ -150,32 +159,17 @@ if [ ! -d "/Applications/Visual Studio Code.app" ]; then
         echo "  [DRY RUN] Would install VS Code"
     else
         echo "  Installing VS Code..."
-        brew install --cask visual-studio-code || {
+        if ! brew install --cask visual-studio-code; then
             echo -e "${RED}✗ VS Code installation failed${NC}"
             INSTALL_SUCCESS=false
-        }
+            FAILED_INSTALLS+=("VS Code")
+        fi
     fi
 else
     echo -e "${GREEN}✓ VS Code already installed${NC}"
 fi
 echo ""
 
-# Install Superwhisper
-echo -e "${YELLOW}⏳ Checking Superwhisper...${NC}"
-if [ ! -d "/Applications/Superwhisper.app" ]; then
-    if [ "$DRY_RUN" = "1" ]; then
-        echo "  [DRY RUN] Would install Superwhisper"
-    else
-        echo "  Installing Superwhisper..."
-        brew install --cask superwhisper || {
-            echo -e "${RED}✗ Superwhisper installation failed${NC}"
-            INSTALL_SUCCESS=false
-        }
-    fi
-else
-    echo -e "${GREEN}✓ Superwhisper already installed${NC}"
-fi
-echo ""
 
 # Install Claude Code via AI Gateway
 echo -e "${YELLOW}⏳ Installing Claude Code...${NC}"
@@ -222,8 +216,8 @@ EOF
             fi
         else
             echo -e "${RED}✗ Claude Code installation failed${NC}"
-            echo "  → Please contact workshop organizers for help"
             INSTALL_SUCCESS=false
+            FAILED_INSTALLS+=("Claude Code")
         fi
     fi
 else
@@ -304,7 +298,20 @@ if [ "$INSTALL_SUCCESS" = true ]; then
     echo ""
     echo "See you at the workshop!"
 else
-    echo -e "${RED}✗ Some installations failed. Please contact the workshop organizers.${NC}"
+    echo -e "${RED}⚠️  Some installations failed${NC}"
+    echo ""
+    echo "The following components had issues:"
+    for failed in "${FAILED_INSTALLS[@]}"; do
+        echo -e "  ${RED}✗ $failed${NC}"
+    done
+    echo ""
+    echo "Common fixes:"
+    echo "  • Check your internet connection"
+    echo "  • Make sure you have enough disk space"
+    echo "  • Try running the installer again"
+    echo ""
+    echo "If problems persist, contact the workshop organizers with"
+    echo "the specific error messages shown above."
     echo ""
     exit 1
 fi
