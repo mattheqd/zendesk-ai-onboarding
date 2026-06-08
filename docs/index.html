@@ -460,33 +460,6 @@
                 </div>
             </div>
 
-            <div class="step">
-                <span class="step-number">2 ·</span>
-                <h3>Install Homebrew (Mac) or WSL (Windows)</h3>
-                <div class="step-content">
-                    <p><strong>Mac:</strong> Homebrew is the package manager that lets you install other tools with one line. Open Terminal (Cmd+Space, type "Terminal", hit Return) and paste:</p>
-                    <div class="command-box">
-                        <button class="copy-btn" onclick="copyBrewCommand()">Copy</button>
-                        <code id="brew-command">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code>
-                    </div>
-                    <p><strong>Windows:</strong> You'll need WSL (Windows Subsystem for Linux). The setup wizard handles this, but if you want to do it manually first, search "WSL" in your start menu.</p>
-                </div>
-            </div>
-
-            <div class="step">
-                <span class="step-number">3 ·</span>
-                <h3>Get your AI Gateway token</h3>
-                <div class="step-content">
-                    <p>The setup wizard will open your browser for you, but here's the manual flow:</p>
-                    <ul class="checklist">
-                        <li>Open <a href="https://ai-gateway.zende.sk" target="_blank">ai-gateway.zende.sk</a></li>
-                        <li>Log in with your Zendesk credentials</li>
-                        <li>Look for your API token (starts with <code>zdai_</code>)</li>
-                        <li>Copy the entire token</li>
-                        <li>Paste it into the wizard when prompted</li>
-                    </ul>
-                </div>
-            </div>
 
             <div class="timeline">
                 <h3>What the wizard installs</h3>
@@ -580,14 +553,9 @@
             copyToClipboard(command, 0);
         }
 
-        function copyBrewCommand() {
-            const command = '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"';
-            copyToClipboard(command, 1);
-        }
-
         function copySlackMessage() {
             const message = '"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"';
-            copyToClipboard(message, 2);
+            copyToClipboard(message, 1);
         }
 
         function copyToClipboard(text, btnIndex) {
