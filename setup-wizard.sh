@@ -353,10 +353,55 @@ step_install_tools() {
         echo ""
         echo -e "${BLUE}Let's connect your GitHub account...${NC}"
         echo ""
-        if ! gh auth login; then
-            echo -e "${RED}✗ GitHub authentication failed${NC}"
+        echo "Tips for authentication:"
+        echo "  • Choose 'GitHub.com' (not Enterprise)"
+        echo "  • Use 'HTTPS' as the protocol (easier than SSH)"
+        echo "  • Select 'Login with a web browser' (recommended)"
+        echo ""
+
+        # Retry loop for GitHub authentication
+        MAX_RETRIES=3
+        RETRY_COUNT=0
+        AUTH_SUCCESS=false
+
+        while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$AUTH_SUCCESS" = false ]; do
+            if [ $RETRY_COUNT -gt 0 ]; then
+                echo ""
+                echo -e "${YELLOW}Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES${NC}"
+                echo ""
+            fi
+
+            if gh auth login; then
+                AUTH_SUCCESS=true
+                echo ""
+                echo -e "${GREEN}✓ GitHub authentication successful!${NC}"
+            else
+                ((RETRY_COUNT++))
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                    echo ""
+                    echo -e "${RED}✗ Authentication failed${NC}"
+                    echo ""
+                    read -p "Try again? (Y/n): " -n 1 -r
+                    echo ""
+                    if [[ $REPLY =~ ^[Nn]$ ]]; then
+                        break
+                    fi
+                fi
+            fi
+        done
+
+        if [ "$AUTH_SUCCESS" = false ]; then
+            echo ""
+            echo -e "${RED}✗ GitHub authentication failed after $RETRY_COUNT attempts${NC}"
+            echo ""
+            echo "Don't worry! You can authenticate later by running:"
+            echo -e "  ${BLUE}gh auth login${NC}"
+            echo ""
+            echo "The rest of the setup will continue."
             INSTALL_SUCCESS=false
             FAILED_INSTALLS+=("GitHub authentication")
+
+            read -p "Press Enter to continue..."
         fi
     fi
 

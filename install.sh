@@ -142,13 +142,49 @@ if [ "$DRY_RUN" != "1" ] && command -v gh &> /dev/null && ! gh auth status &> /d
     echo ""
     echo -e "${BLUE}Let's connect your GitHub account...${NC}"
     echo ""
-    if ! gh auth login; then
-        echo -e "${RED}✗ GitHub authentication failed${NC}"
+    echo "Tips: Choose GitHub.com, HTTPS protocol, and 'Login with web browser'"
+    echo ""
+
+    # Retry loop for GitHub authentication
+    MAX_RETRIES=3
+    RETRY_COUNT=0
+    AUTH_SUCCESS=false
+
+    while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$AUTH_SUCCESS" = false ]; do
+        if [ $RETRY_COUNT -gt 0 ]; then
+            echo ""
+            echo -e "${YELLOW}Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES${NC}"
+            echo ""
+        fi
+
+        if gh auth login; then
+            AUTH_SUCCESS=true
+            echo ""
+            echo -e "${GREEN}✓ GitHub authentication successful!${NC}"
+        else
+            ((RETRY_COUNT++))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo ""
+                echo -e "${RED}✗ Authentication failed${NC}"
+                echo ""
+                read -p "Try again? (Y/n): " -n 1 -r
+                echo ""
+                if [[ $REPLY =~ ^[Nn]$ ]]; then
+                    break
+                fi
+            fi
+        fi
+    done
+
+    if [ "$AUTH_SUCCESS" = false ]; then
+        echo ""
+        echo -e "${RED}✗ GitHub authentication failed after $RETRY_COUNT attempts${NC}"
+        echo "  → You can authenticate later with: gh auth login"
         INSTALL_SUCCESS=false
         FAILED_INSTALLS+=("GitHub authentication")
     fi
 elif [ "$DRY_RUN" = "1" ] && ! gh auth status &> /dev/null 2>&1; then
-    echo "  [DRY RUN] Would prompt for GitHub authentication"
+    echo "  [DRY RUN] Would prompt for GitHub authentication with retry logic"
 fi
 echo ""
 
