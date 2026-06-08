@@ -433,26 +433,31 @@
                 <p><strong>Claude Code</strong> is not a website you log into. It's an agent that runs on your laptop, talks to your filesystem, and edits real files, authenticated to Zendesk's internal AI Gateway. Setting that up takes a few small installs. Do it once and you have these superpowers forever.</p>
             </div>
 
+            <div class="warning-box">
+                <h3>Before you run setup</h3>
+
+                <p style="margin-top: 20px;"><strong>1. Connect to GlobalProtect VPN</strong></p>
+                <p>The AI Gateway and all internal Zendesk services are behind the corporate network. If GlobalProtect is off, the setup will fail. Connect to VPN before running the command below.</p>
+
+                <p style="margin-top: 25px;"><strong>2. Get GitHub access</strong></p>
+                <p>If you're not already in the <strong>zendesk GitHub org</strong>, you need access before the workshop. Request access as early as possible—it can take time depending on IT's queue.</p>
+                <p style="margin-top: 15px;"><strong>Action:</strong> Ping <strong>#it-help</strong> on Slack:</p>
+                <div class="command-box" style="margin-top: 15px;">
+                    <button class="copy-btn" onclick="copySlackMessage()">Copy</button>
+                    <code id="slack-message">"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"</code>
+                </div>
+            </div>
+
             <div class="step">
                 <span class="step-number">§</span>
                 <h3>Quick Setup</h3>
                 <div class="step-content">
-                    <p>Open <strong>Terminal</strong> (Cmd+Space, type "Terminal", hit Return) and paste:</p>
+                    <p>Once VPN is connected, open <strong>Terminal</strong> (Cmd+Space, type "Terminal", hit Return) and paste:</p>
                     <div class="command-box">
                         <button class="copy-btn" onclick="copyCommand()">Copy</button>
                         <code id="setup-command">bash &lt;(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)</code>
                     </div>
-                    <p><strong>Important:</strong> Make sure GlobalProtect VPN is connected first. If <code>ai-gateway.zende.sk</code> is unreachable, nothing works.</p>
-                </div>
-            </div>
-
-            <div class="warning-box">
-                <h3>GitHub access required</h3>
-                <p>If you're not already in the <strong>zendesk GitHub org</strong>, you need access before the workshop. Request access as early as possible—it can take time depending on IT's queue.</p>
-                <p style="margin-top: 20px;"><strong>Action:</strong> Ping <strong>#it-help</strong> on Slack:</p>
-                <div class="command-box" style="margin-top: 15px;">
-                    <button class="copy-btn" onclick="copySlackMessage()">Copy</button>
-                    <code id="slack-message">"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"</code>
+                    <p>The wizard will guide you through the rest.</p>
                 </div>
             </div>
 
