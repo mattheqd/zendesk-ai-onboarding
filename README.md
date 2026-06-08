@@ -2,11 +2,24 @@
 
 Automated setup scripts to get Zendesk designers ready for the Claude Code workshop in ~10 minutes.
 
-## 🧙 Interactive Setup Wizard (Recommended)
+## 🚀 Quick Start (One-Line Setup)
 
-**One command to rule them all:**
+**Copy and paste this into Terminal:**
 
 ```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)
+```
+
+Make sure **GlobalProtect VPN is connected** first!
+
+---
+
+## 🧙 Interactive Setup Wizard (Recommended)
+
+**Or download and run locally:**
+
+```bash
+curl -O https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh
 bash setup-wizard.sh
 ```
 
