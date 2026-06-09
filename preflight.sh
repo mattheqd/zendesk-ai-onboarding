@@ -86,48 +86,83 @@ echo ""
 # Check 3: AI Gateway token
 echo -e "${YELLOW}⏳ Setting up AI Gateway access...${NC}"
 echo ""
-echo "You'll need an AI Gateway token to use Claude Code."
-echo ""
-echo -e "${BLUE}To get your token:${NC}"
-echo "  1. Open https://ai-gateway.zende.sk in your browser"
-echo "  2. Log in with your Zendesk credentials"
-echo "  3. Look for your API token (starts with 'zdai_')"
-echo "  4. Copy the entire token"
-echo ""
 
-# Prompt for token
-read -p "Paste your AI Gateway token here: " AI_GATEWAY_TOKEN
+# Check for existing token first
+EXISTING_TOKEN=""
+if [ -f ~/.claude/settings.json ]; then
+    EXISTING_TOKEN=$(command -v jq &> /dev/null && jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' ~/.claude/settings.json 2>/dev/null || echo "")
+fi
 
-# Trim whitespace
-AI_GATEWAY_TOKEN=$(echo "$AI_GATEWAY_TOKEN" | xargs)
+if [[ "$EXISTING_TOKEN" =~ ^zdai_ ]]; then
+    echo "Found existing AI Gateway token in Claude Code config."
+    echo -e "${YELLOW}  Testing existing token...${NC}"
 
-# Validate token format
-if [[ ! "$AI_GATEWAY_TOKEN" =~ ^zdai_ ]]; then
-    echo -e "${RED}✗ Token doesn't look right (should start with 'zdai_')${NC}"
-    echo "  → Please get your token from https://ai-gateway.zende.sk"
-    ALL_CHECKS_PASSED=false
-else
-    echo -e "${YELLOW}  Testing token...${NC}"
-
-    # Test token against AI Gateway (using bedrock endpoint)
+    # Test existing token
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-        -H "Authorization: Bearer $AI_GATEWAY_TOKEN" \
+        -H "Authorization: Bearer $EXISTING_TOKEN" \
         https://ai-gateway.zende.sk/bedrock/v1/messages \
         -H "Content-Type: application/json" \
-        -d '{"model":"claude-sonnet-4.5","max_tokens":1,"messages":[{"role":"user","content":"test"}]}')
+        -d '{"model":"claude-sonnet-4.5","max_tokens":1,"messages":[{"role":"user","content":"test"}]}' 2>/dev/null)
 
     if [[ "$HTTP_CODE" == "200" ]] || [[ "$HTTP_CODE" == "400" ]]; then
-        # 200 or 400 means auth worked (400 is expected with minimal request)
-        echo -e "${GREEN}✓ AI Gateway token is valid${NC}"
-
-        # Store token securely for install script
-        echo "$AI_GATEWAY_TOKEN" > "$TOKEN_FILE"
+        echo -e "${GREEN}✓ Existing token is valid - will use this${NC}"
+        echo "$EXISTING_TOKEN" > "$TOKEN_FILE"
         chmod 600 "$TOKEN_FILE"
     else
-        echo -e "${RED}✗ AI Gateway token validation failed (HTTP $HTTP_CODE)${NC}"
-        echo "  → Please check your token and try again"
-        echo "  → Get a fresh token from https://ai-gateway.zende.sk"
+        echo -e "${YELLOW}⚠ Existing token is invalid or expired${NC}"
+        echo "  → You'll need to provide a fresh token"
+        echo ""
+
+        # Continue to prompt for new token below
+        EXISTING_TOKEN=""
+    fi
+fi
+
+# If no valid existing token, prompt for a new one
+if [[ ! "$EXISTING_TOKEN" =~ ^zdai_ ]]; then
+    echo "You'll need an AI Gateway token to use Claude Code."
+    echo ""
+    echo -e "${BLUE}To get your token:${NC}"
+    echo "  1. Open https://ai-gateway.zende.sk in your browser"
+    echo "  2. Log in with your Zendesk credentials"
+    echo "  3. Look for your API token (starts with 'zdai_')"
+    echo "  4. Copy the entire token"
+    echo ""
+
+    # Prompt for token
+    read -p "Paste your AI Gateway token here: " AI_GATEWAY_TOKEN
+
+    # Trim whitespace
+    AI_GATEWAY_TOKEN=$(echo "$AI_GATEWAY_TOKEN" | xargs)
+
+    # Validate token format
+    if [[ ! "$AI_GATEWAY_TOKEN" =~ ^zdai_ ]]; then
+        echo -e "${RED}✗ Token doesn't look right (should start with 'zdai_')${NC}"
+        echo "  → Please get your token from https://ai-gateway.zende.sk"
         ALL_CHECKS_PASSED=false
+    else
+        echo -e "${YELLOW}  Testing token...${NC}"
+
+        # Test token against AI Gateway (using bedrock endpoint)
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $AI_GATEWAY_TOKEN" \
+            https://ai-gateway.zende.sk/bedrock/v1/messages \
+            -H "Content-Type: application/json" \
+            -d '{"model":"claude-sonnet-4.5","max_tokens":1,"messages":[{"role":"user","content":"test"}]}')
+
+        if [[ "$HTTP_CODE" == "200" ]] || [[ "$HTTP_CODE" == "400" ]]; then
+            # 200 or 400 means auth worked (400 is expected with minimal request)
+            echo -e "${GREEN}✓ AI Gateway token is valid${NC}"
+
+            # Store token securely for install script
+            echo "$AI_GATEWAY_TOKEN" > "$TOKEN_FILE"
+            chmod 600 "$TOKEN_FILE"
+        else
+            echo -e "${RED}✗ AI Gateway token validation failed (HTTP $HTTP_CODE)${NC}"
+            echo "  → Please check your token and try again"
+            echo "  → Get a fresh token from https://ai-gateway.zende.sk"
+            ALL_CHECKS_PASSED=false
+        fi
     fi
 fi
 echo ""

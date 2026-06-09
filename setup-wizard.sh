@@ -177,6 +177,43 @@ step_token_setup() {
     show_header
     show_step "🔑 Setting Up AI Gateway Access"
 
+    # Check if user already has a token in existing Claude Code config
+    if [ -f ~/.claude/settings.json ]; then
+        EXISTING_TOKEN=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' ~/.claude/settings.json 2>/dev/null)
+        if [[ "$EXISTING_TOKEN" =~ ^zdai_ ]]; then
+            echo "Found existing AI Gateway token in Claude Code config."
+            echo ""
+            echo -e "${YELLOW}Testing existing token...${NC}"
+
+            # Test existing token
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                -H "Authorization: Bearer $EXISTING_TOKEN" \
+                https://ai-gateway.zende.sk/bedrock/v1/messages \
+                -H "Content-Type: application/json" \
+                -d '{"model":"claude-sonnet-4.5","max_tokens":1,"messages":[{"role":"user","content":"test"}]}' 2>/dev/null)
+
+            if [[ "$HTTP_CODE" == "200" ]] || [[ "$HTTP_CODE" == "400" ]]; then
+                echo -e "${GREEN}✓ Existing token is valid!${NC}"
+                echo ""
+                read -p "Use this token? (Y/n): " -n 1 -r
+                echo ""
+                if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                    AI_GATEWAY_TOKEN="$EXISTING_TOKEN"
+                    echo "$AI_GATEWAY_TOKEN" > "$TOKEN_FILE"
+                    chmod 600 "$TOKEN_FILE"
+                    press_to_continue
+                    ((STEP++))
+                    return
+                fi
+            else
+                echo -e "${YELLOW}⚠ Existing token is invalid or expired${NC}"
+                echo "Let's get a fresh one."
+                echo ""
+            fi
+        fi
+    fi
+
+    # No valid existing token, proceed to get a new one
     echo "You'll need an AI Gateway token to use Claude Code."
     echo ""
     echo -e "${BLUE}To get your token:${NC}"
