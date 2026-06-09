@@ -397,10 +397,7 @@ step_install_tools() {
         echo ""
         echo -e "${BLUE}Let's connect your GitHub account...${NC}"
         echo ""
-        echo "Tips for authentication:"
-        echo "  • Choose 'GitHub.com' (not Enterprise)"
-        echo "  • Use 'HTTPS' as the protocol (easier than SSH)"
-        echo "  • Select 'Login with a web browser' (recommended)"
+        echo "This will open your browser to log in with GitHub."
         echo ""
 
         # Retry loop for GitHub authentication
@@ -415,7 +412,8 @@ step_install_tools() {
                 echo ""
             fi
 
-            if gh auth login; then
+            # Auto-select HTTPS protocol and web browser login
+            if gh auth login -h github.com -p https -w; then
                 AUTH_SUCCESS=true
                 echo ""
                 echo -e "${GREEN}✓ GitHub authentication successful!${NC}"

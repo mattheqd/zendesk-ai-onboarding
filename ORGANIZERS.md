@@ -103,7 +103,7 @@ React below!
 → Connect to GlobalProtect VPN
 
 **"GitHub authentication fails"**
-→ Choose: GitHub.com, HTTPS, Login with web browser
+→ Wizard auto-selects HTTPS and browser login. Check they're using correct Zendesk GitHub credentials.
 
 **"Not in zendesk org"**
 → Too late for workshop - they can pair with someone who has access
