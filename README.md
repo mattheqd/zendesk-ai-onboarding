@@ -28,8 +28,9 @@ The wizard will guide you through:
 2. ✓ GitHub access verification
 3. ✓ AI Gateway token setup (opens browser for you!)
 4. ✓ Tool installation (Homebrew, Node, VS Code, etc.)
-5. ✓ Claude Code installation
-6. ✓ Final verification
+5. ✓ SSH key setup for GitHub (for marketplace access)
+6. ✓ Claude Code installation
+7. ✓ Final verification
 
 **Features:**
 - 🎨 Clean, designer-friendly interface
@@ -89,6 +90,15 @@ bash preflight.sh && bash install.sh
 - Get a fresh token from https://ai-gateway.zende.sk
 - Token should start with `zdai_`
 - Make sure you're logged in with your Zendesk credentials
+
+### SSH & Marketplace Issues
+**If marketplace command fails with "SSH host key not in known_hosts":**
+```bash
+ssh -T git@github.com
+```
+Type `yes` when asked about the fingerprint, then retry the marketplace command.
+
+The setup wizard handles this automatically, but if you skipped SSH setup or need to fix it manually, the command above will work.
 
 ### Install Failures
 - Check your internet connection

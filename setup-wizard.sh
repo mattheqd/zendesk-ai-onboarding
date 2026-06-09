@@ -470,7 +470,75 @@ step_install_tools() {
     ((STEP++))
 }
 
-# Step 6: Install Claude Code
+# Step 6: Setup SSH for GitHub
+step_setup_ssh() {
+    show_header
+    show_step "🔑 Setting up SSH for GitHub"
+
+    echo "The Zendesk Claude Code marketplace requires SSH access."
+    echo "Let's make sure your SSH keys are configured."
+    echo ""
+
+    # Check if SSH key exists
+    if [ -f ~/.ssh/id_ed25519 ] || [ -f ~/.ssh/id_rsa ]; then
+        echo -e "${GREEN}✓ SSH key already exists${NC}"
+    else
+        echo "Generating a new SSH key..."
+        ssh-keygen -t ed25519 -C "$(git config user.email || echo "$(whoami)@zendesk.com")" -f ~/.ssh/id_ed25519 -N ""
+        echo -e "${GREEN}✓ SSH key generated${NC}"
+    fi
+
+    echo ""
+
+    # Add SSH key to GitHub using gh CLI
+    if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+        echo "Adding SSH key to your GitHub account..."
+
+        # Check if key is already uploaded
+        if gh ssh-key list 2>/dev/null | grep -q "$(ssh-keygen -lf ~/.ssh/id_ed25519.pub 2>/dev/null | awk '{print $2}')"; then
+            echo -e "${GREEN}✓ SSH key already uploaded to GitHub${NC}"
+        else
+            # Upload the key
+            if gh ssh-key add ~/.ssh/id_ed25519.pub --title "Zendesk Workshop - $(hostname)" 2>/dev/null; then
+                echo -e "${GREEN}✓ SSH key uploaded to GitHub${NC}"
+            else
+                echo -e "${YELLOW}⚠ Could not upload SSH key automatically${NC}"
+                echo "  You can add it manually later at: https://github.com/settings/keys"
+            fi
+        fi
+    else
+        echo -e "${YELLOW}⚠ Skipping SSH key upload (GitHub not authenticated)${NC}"
+        echo "  You can add your key manually at: https://github.com/settings/keys"
+    fi
+
+    echo ""
+
+    # Add GitHub to known_hosts
+    echo "Adding GitHub to known hosts..."
+    if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+        ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null
+        echo -e "${GREEN}✓ GitHub added to known hosts${NC}"
+    else
+        echo -e "${GREEN}✓ GitHub already in known hosts${NC}"
+    fi
+
+    echo ""
+
+    # Test SSH connection
+    echo "Testing SSH connection to GitHub..."
+    if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+        echo -e "${GREEN}✓ SSH connection successful!${NC}"
+    else
+        echo -e "${YELLOW}⚠ SSH test returned an unexpected response${NC}"
+        echo "  This is usually fine - we'll verify marketplace access later"
+    fi
+
+    echo ""
+    press_to_continue
+    ((STEP++))
+}
+
+# Step 7: Install Claude Code
 step_install_claude() {
     show_header
     show_step "🤖 Installing Claude Code"
@@ -556,7 +624,7 @@ EOF
     ((STEP++))
 }
 
-# Step 7: Final Check
+# Step 8: Final Check
 step_final_check() {
     show_header
     show_step "✅ Final Check"
@@ -636,6 +704,7 @@ main() {
     step_github_check
     step_token_setup
     step_install_tools
+    step_setup_ssh
     step_install_claude
     step_final_check
 }
