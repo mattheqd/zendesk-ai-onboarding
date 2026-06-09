@@ -534,6 +534,36 @@ step_setup_ssh() {
     fi
 
     echo ""
+
+    # Important: SSO authorization step
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  IMPORTANT: Authorize your SSH key for Zendesk org${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo "One more step to access the Zendesk marketplace:"
+    echo ""
+    echo "1. Go to: ${BLUE}https://github.com/settings/keys${NC}"
+    echo "2. Find your SSH key: 'Zendesk Workshop - $(hostname)'"
+    echo "3. Click the ${BLUE}Configure SSO${NC} button next to it"
+    echo "4. Click ${BLUE}Authorize${NC} for the 'zendesk' organization"
+    echo ""
+    echo -e "${YELLOW}Why?${NC} Zendesk GitHub uses Okta SSO. SSH keys need explicit"
+    echo "authorization to access private repos like the marketplace."
+    echo ""
+
+    read -p "Open GitHub settings now? (Y/n): " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        open "https://github.com/settings/keys" 2>/dev/null || true
+        echo "Browser opened. Authorize your SSH key and come back here."
+    else
+        echo "No worries! You can authorize it later before using the marketplace."
+    fi
+
+    echo ""
+    read -p "Press Enter once you've authorized the key (or skip for now)..."
+
+    echo ""
     press_to_continue
     ((STEP++))
 }

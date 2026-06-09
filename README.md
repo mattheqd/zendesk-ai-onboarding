@@ -92,13 +92,23 @@ bash preflight.sh && bash install.sh
 - Make sure you're logged in with your Zendesk credentials
 
 ### SSH & Marketplace Issues
-**If marketplace command fails with "SSH host key not in known_hosts":**
+
+**Most common: SSH key needs SSO authorization**
+
+If marketplace fails with "permission denied" or "authentication failed":
+
+1. Go to https://github.com/settings/keys
+2. Find your SSH key (named "Zendesk Workshop - [hostname]")
+3. Click **Configure SSO** next to it
+4. Click **Authorize** for the "zendesk" organization
+
+**Why?** Zendesk GitHub uses Okta SSO. SSH keys need explicit org-level authorization to access private repos like the marketplace. The setup wizard prompts you to do this, but if you skipped it, use the steps above.
+
+**If marketplace fails with "SSH host key not in known_hosts":**
 ```bash
 ssh -T git@github.com
 ```
 Type `yes` when asked about the fingerprint, then retry the marketplace command.
-
-The setup wizard handles this automatically, but if you skipped SSH setup or need to fix it manually, the command above will work.
 
 ### Install Failures
 - Check your internet connection
