@@ -521,16 +521,14 @@ EOF
         echo -e "${GREEN}✓ Claude Code already installed${NC}"
         echo ""
 
-        # Only prompt to update token if they didn't already choose to use existing token
-        if [ "$USED_EXISTING_TOKEN" = true ]; then
-            echo "Using your existing token from earlier."
+        # Only update config if they provided a NEW token (not if they reused existing)
+        if [ "$USED_EXISTING_TOKEN" = "true" ]; then
+            echo "Token already configured - no changes needed."
         else
-            # Prompt to update token
-            echo -e "${BLUE}Your existing Claude Code setup was detected.${NC}"
-            echo ""
-            echo "Would you like to update your AI Gateway access token?"
-            echo "  → Only say yes if your current token has expired or stopped working"
-            echo "  → If Claude Code is working fine for you, you can skip this"
+            # They provided a new token, offer to update the config
+            echo -e "${BLUE}Would you like to update your AI Gateway token?${NC}"
+            echo "  → Say yes if you got a fresh token"
+            echo "  → Say no to keep your existing token"
             echo ""
             read -p "Update token? (y/N): " -n 1 -r
             echo ""
@@ -539,6 +537,8 @@ EOF
                 if [ -f ~/.claude/settings.json ]; then
                     jq --arg token "$AI_GATEWAY_TOKEN" '.env.ANTHROPIC_AUTH_TOKEN = $token' ~/.claude/settings.json > ~/.claude/settings.json.tmp && mv ~/.claude/settings.json.tmp ~/.claude/settings.json
                     echo -e "${GREEN}  ✓ Token updated${NC}"
+                else
+                    echo -e "${YELLOW}  ⚠ Settings file not found${NC}"
                 fi
             else
                 echo "  Keeping your existing token"
