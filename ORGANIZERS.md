@@ -108,6 +108,9 @@ React below!
 **"Not in zendesk org"**
 → Too late for workshop - they can pair with someone who has access
 
+**"Marketplace command fails"**
+→ Make sure `gh auth status` shows they're authenticated. The marketplace uses HTTPS (not SSH) via GitHub CLI credentials from setup.
+
 ---
 
 ## 📁 Files in This Repo

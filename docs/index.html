@@ -515,6 +515,23 @@
                 <strong>Note:</strong> If you already have some tools installed, the wizard will skip them</p>
             </div>
 
+            <div class="setup-box">
+                <h3>After Setup: Add the Zendesk Marketplace</h3>
+                <p>Once setup is complete, you can install Zendesk-specific plugins from the internal marketplace. Open a <strong>new</strong> terminal and run:</p>
+                <div class="command-box" style="margin-top: 15px;">
+                    <button class="copy-btn" onclick="copyMarketplace()">Copy</button>
+                    <code id="marketplace-command">claude</code>
+                </div>
+                <p style="margin-top: 15px;">Then inside Claude Code, type:</p>
+                <div class="command-box" style="margin-top: 10px;">
+                    <code>/plugin marketplace add zendesk/claude-code-marketplace</code>
+                </div>
+                <p style="margin-top: 15px;">Install plugins like the article writer:</p>
+                <div class="command-box" style="margin-top: 10px;">
+                    <code>/plugin install zendeskdev-article-writer</code>
+                </div>
+                <p style="margin-top: 15px;"><strong>Note:</strong> The marketplace uses your GitHub authentication from the setup (no extra SSH needed!).</p>
+            </div>
 
             <div class="section">
                 <div class="section-label">Common Issues</div>
@@ -572,6 +589,11 @@
         function copySlackMessage() {
             const message = '"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"';
             copyToClipboard(message, 1);
+        }
+
+        function copyMarketplace() {
+            const command = 'claude';
+            copyToClipboard(command, 2);
         }
 
         function copyToClipboard(text, btnIndex) {

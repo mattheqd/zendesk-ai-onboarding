@@ -90,6 +90,14 @@ bash preflight.sh && bash install.sh
 - Token should start with `zdai_`
 - Make sure you're logged in with your Zendesk credentials
 
+### Marketplace Access
+After setup, add the Zendesk marketplace inside Claude Code:
+```bash
+/plugin marketplace add zendesk/claude-code-marketplace
+```
+
+The marketplace uses your GitHub HTTPS authentication from the setup wizard — no extra SSH configuration needed!
+
 ### Install Failures
 - Check your internet connection
 - Some tools may require admin approval on first launch
