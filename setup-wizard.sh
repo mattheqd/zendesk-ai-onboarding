@@ -313,6 +313,11 @@ step_install_tools() {
     echo -e "${YELLOW}⏳ Checking Homebrew...${NC}"
     if ! command -v brew &> /dev/null; then
         echo "  Installing Homebrew..."
+        echo ""
+        echo -e "${BLUE}  Note: You may be asked for your Mac password.${NC}"
+        echo -e "${BLUE}  The password won't show as you type (not even dots) - this is normal.${NC}"
+        echo -e "${BLUE}  Just type your password and press Enter.${NC}"
+        echo ""
         if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
             # Add brew to PATH for Apple Silicon
             if [[ $(uname -m) == "arm64" ]]; then
