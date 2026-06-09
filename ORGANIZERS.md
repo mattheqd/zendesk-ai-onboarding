@@ -96,12 +96,6 @@ React below!
 
 ## 🆘 Common Issues on Workshop Day
 
-**"Marketplace fails with permission denied"** ⚠️ MOST COMMON
-→ SSH key not SSO-authorized. Guide them to:
-  1. https://github.com/settings/keys
-  2. Find their key → Configure SSO → Authorize for "zendesk"
-  3. Retry the `/plugin marketplace add` command
-
 **"claude command not found"**
 → Open a **new** terminal window, or run: `source ~/.zshrc`
 

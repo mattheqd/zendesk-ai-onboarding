@@ -537,16 +537,7 @@
                 <div class="command-box" style="margin-top: 10px;">
                     <code>/plugin install zendeskdev-article-writer</code>
                 </div>
-
-                <p style="margin-top: 25px;"><strong>Important: SSH Key SSO Authorization</strong></p>
-                <p>The setup wizard generates and uploads your SSH key, but you need to authorize it for the Zendesk org (one-time step):</p>
-                <ol style="margin: 15px 0 0 25px; color: #4b5563; line-height: 1.8;">
-                    <li>Go to <a href="https://github.com/settings/keys" target="_blank">github.com/settings/keys</a></li>
-                    <li>Find your SSH key (named "Zendesk Workshop - [your computer name]")</li>
-                    <li>Click <strong>Configure SSO</strong> next to it</li>
-                    <li>Click <strong>Authorize</strong> for the "zendesk" organization</li>
-                </ol>
-                <p style="margin-top: 15px;"><em>Why?</em> Zendesk GitHub uses Okta SSO. SSH keys need explicit org-level authorization to access private repos like the marketplace.</p>
+                <p style="margin-top: 15px;"><strong>Note:</strong> The setup wizard configures SSH access so the marketplace "just works." If you skipped SSH setup, see troubleshooting below.</p>
             </div>
 
 
@@ -579,11 +570,6 @@
                 <div class="trouble-item">
                     <strong>claude command not found after install</strong>
                     <p>Open a <strong>new</strong> terminal window (the PATH only updates in new shells). Or run: <code>source ~/.zshrc</code></p>
-                </div>
-
-                <div class="trouble-item">
-                    <strong>Marketplace fails with "permission denied" or "authentication failed"</strong>
-                    <p><strong>Most common cause:</strong> SSH key not authorized for Zendesk org SSO. Go to <a href="https://github.com/settings/keys" target="_blank">github.com/settings/keys</a>, find your key, click <strong>Configure SSO</strong> → <strong>Authorize</strong> for "zendesk".</p>
                 </div>
 
                 <div class="trouble-item">
