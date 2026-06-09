@@ -23,6 +23,7 @@ ALL_CHECKS_PASSED=true
 INSTALL_SUCCESS=true
 AI_GATEWAY_TOKEN=""
 TOKEN_FILE="$HOME/.zendesk_ai_gateway_token_temp"
+USED_EXISTING_TOKEN=false
 
 # Track failed installations
 FAILED_INSTALLS=()
@@ -199,6 +200,7 @@ step_token_setup() {
                 echo ""
                 if [[ ! $REPLY =~ ^[Nn]$ ]]; then
                     AI_GATEWAY_TOKEN="$EXISTING_TOKEN"
+                    USED_EXISTING_TOKEN=true
                     echo "$AI_GATEWAY_TOKEN" > "$TOKEN_FILE"
                     chmod 600 "$TOKEN_FILE"
                     press_to_continue
@@ -519,23 +521,28 @@ EOF
         echo -e "${GREEN}✓ Claude Code already installed${NC}"
         echo ""
 
-        # Prompt to update token
-        echo -e "${BLUE}Your existing Claude Code setup was detected.${NC}"
-        echo ""
-        echo "Would you like to update your AI Gateway access token?"
-        echo "  → Only say yes if your current token has expired or stopped working"
-        echo "  → If Claude Code is working fine for you, you can skip this"
-        echo ""
-        read -p "Update token? (y/N): " -n 1 -r
-        echo ""
-
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            if [ -f ~/.claude/settings.json ]; then
-                jq --arg token "$AI_GATEWAY_TOKEN" '.env.ANTHROPIC_AUTH_TOKEN = $token' ~/.claude/settings.json > ~/.claude/settings.json.tmp && mv ~/.claude/settings.json.tmp ~/.claude/settings.json
-                echo -e "${GREEN}  ✓ Token updated${NC}"
-            fi
+        # Only prompt to update token if they didn't already choose to use existing token
+        if [ "$USED_EXISTING_TOKEN" = true ]; then
+            echo "Using your existing token from earlier."
         else
-            echo "  Keeping your existing token"
+            # Prompt to update token
+            echo -e "${BLUE}Your existing Claude Code setup was detected.${NC}"
+            echo ""
+            echo "Would you like to update your AI Gateway access token?"
+            echo "  → Only say yes if your current token has expired or stopped working"
+            echo "  → If Claude Code is working fine for you, you can skip this"
+            echo ""
+            read -p "Update token? (y/N): " -n 1 -r
+            echo ""
+
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                if [ -f ~/.claude/settings.json ]; then
+                    jq --arg token "$AI_GATEWAY_TOKEN" '.env.ANTHROPIC_AUTH_TOKEN = $token' ~/.claude/settings.json > ~/.claude/settings.json.tmp && mv ~/.claude/settings.json.tmp ~/.claude/settings.json
+                    echo -e "${GREEN}  ✓ Token updated${NC}"
+                fi
+            else
+                echo "  Keeping your existing token"
+            fi
         fi
     fi
 
