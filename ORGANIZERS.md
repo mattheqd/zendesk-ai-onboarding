@@ -109,7 +109,7 @@ React below!
 → Too late for workshop - they can pair with someone who has access
 
 **"Marketplace command fails"**
-→ Make sure `gh auth status` shows they're authenticated. The marketplace uses HTTPS (not SSH) via GitHub CLI credentials from setup.
+→ Check `gh auth status` (needs HTTPS auth). If they have SSH keys, they may need SSO authorization at github.com/settings/keys → Configure SSO → Authorize for "zendesk". Wizard prompts for this during setup.
 
 ---
 

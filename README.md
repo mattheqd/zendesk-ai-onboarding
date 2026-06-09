@@ -96,7 +96,13 @@ After setup, add the Zendesk marketplace inside Claude Code:
 /plugin marketplace add zendesk/claude-code-marketplace
 ```
 
-The marketplace uses your GitHub HTTPS authentication from the setup wizard — no extra SSH configuration needed!
+**How it works:**
+- No SSH keys? Uses HTTPS via `gh auth login` ✅
+- Have SSH keys? Wizard guides you to authorize them for Zendesk org SSO ✅
+
+If marketplace fails with "permission denied" and you have SSH keys:
+1. Go to https://github.com/settings/keys
+2. Find your SSH key → **Configure SSO** → **Authorize** for "zendesk"
 
 ### Install Failures
 - Check your internet connection

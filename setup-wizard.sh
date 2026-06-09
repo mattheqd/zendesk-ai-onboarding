@@ -444,6 +444,66 @@ step_install_tools() {
             FAILED_INSTALLS+=("GitHub authentication")
 
             read -p "Press Enter to continue..."
+        else
+            # GitHub auth succeeded - check if SSH keys need SSO authorization
+            echo ""
+            if [ -f ~/.ssh/id_ed25519 ] || [ -f ~/.ssh/id_rsa ]; then
+                echo -e "${BLUE}Detected SSH keys - configuring for Zendesk GitHub...${NC}"
+                echo ""
+
+                # Add GitHub to known_hosts
+                if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+                    ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null
+                    echo -e "${GREEN}✓ GitHub added to known hosts${NC}"
+                fi
+
+                # Test SSH connection
+                echo "Testing SSH connection to GitHub..."
+                SSH_TEST=$(ssh -T git@github.com 2>&1)
+
+                if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
+                    echo -e "${GREEN}✓ SSH connection works!${NC}"
+                    echo "  Marketplace will use SSH"
+                elif echo "$SSH_TEST" | grep -qi "permission denied\|publickey"; then
+                    echo -e "${YELLOW}⚠ SSH key needs SSO authorization for Zendesk org${NC}"
+                    echo ""
+                    echo "Your SSH key exists but isn't authorized for the Zendesk organization."
+                    echo ""
+                    echo "Quick fix (one-time):"
+                    echo "  1. Go to: ${BLUE}https://github.com/settings/keys${NC}"
+                    echo "  2. Find your SSH key"
+                    echo "  3. Click ${BLUE}Configure SSO${NC} button next to it"
+                    echo "  4. Click ${BLUE}Authorize${NC} for the 'zendesk' organization"
+                    echo ""
+
+                    read -p "Open GitHub settings now? (Y/n): " -n 1 -r
+                    echo ""
+                    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                        open "https://github.com/settings/keys" 2>/dev/null || true
+                        echo "Browser opened. Please authorize your SSH key."
+                    fi
+
+                    echo ""
+                    read -p "Press Enter after authorizing the key (or skip for now)..."
+
+                    # Re-test SSH connection
+                    echo ""
+                    echo "Re-testing SSH connection..."
+                    SSH_TEST=$(ssh -T git@github.com 2>&1)
+
+                    if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
+                        echo -e "${GREEN}✓ SSH authorized! Marketplace will work.${NC}"
+                    else
+                        echo -e "${YELLOW}⚠ SSH still not working${NC}"
+                        echo "  → No worries! Marketplace will use HTTPS instead"
+                        echo "  → Everything will still work with your GitHub login"
+                    fi
+                fi
+                echo ""
+            else
+                echo -e "${GREEN}✓ No SSH keys detected - marketplace will use HTTPS${NC}"
+                echo ""
+            fi
         fi
     fi
 

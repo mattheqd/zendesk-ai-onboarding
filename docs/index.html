@@ -530,7 +530,7 @@
                 <div class="command-box" style="margin-top: 10px;">
                     <code>/plugin install zendeskdev-article-writer</code>
                 </div>
-                <p style="margin-top: 15px;"><strong>Note:</strong> The marketplace uses your GitHub authentication from the setup (no extra SSH needed!).</p>
+                <p style="margin-top: 15px;"><strong>Note:</strong> The marketplace works with your GitHub authentication from the setup. If you have SSH keys, the wizard will help you authorize them for the Zendesk org. Otherwise, it uses HTTPS automatically.</p>
             </div>
 
             <div class="section">
@@ -557,6 +557,11 @@
                 <div class="trouble-item">
                     <strong>GitHub authentication keeps failing</strong>
                     <p>The wizard uses browser login automatically. Make sure you're logging in with your Zendesk GitHub account credentials.</p>
+                </div>
+
+                <div class="trouble-item">
+                    <strong>Marketplace fails with "permission denied"</strong>
+                    <p>If you have SSH keys: Go to <a href="https://github.com/settings/keys" target="_blank">github.com/settings/keys</a>, find your key, click <strong>Configure SSO</strong> → <strong>Authorize</strong> for "zendesk". The wizard prompts you to do this, but if you skipped it, you can fix it anytime.</p>
                 </div>
 
                 <div class="trouble-item">
