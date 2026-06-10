@@ -567,6 +567,11 @@
                 </div>
 
                 <div class="trouble-item">
+                    <strong>Marketplace fails with "SSH host key is not in your known_hosts file"</strong>
+                    <p>First, try: <code>ssh -T git@github.com</code> (type <strong>yes</strong> when prompted). If this fails or you get "permission denied", you need to set up SSH keys — see the <strong>Manual SSH Key Setup</strong> section below.</p>
+                </div>
+
+                <div class="trouble-item">
                     <strong>claude command not found after install</strong>
                     <p>Open a <strong>new</strong> terminal window (the PATH only updates in new shells). Or run: <code>source ~/.zshrc</code></p>
                 </div>
@@ -574,7 +579,7 @@
 
             <div class="setup-box" style="margin-top: 60px;">
                 <h3>Manual SSH Key Setup (Advanced)</h3>
-                <p>If you need to manually configure SSH keys for GitHub (most users won't need this):</p>
+                <p>If the marketplace fails with SSH errors and <code>ssh -T git@github.com</code> doesn't work, follow these steps to set up SSH keys manually:</p>
 
                 <p style="margin-top: 25px;"><strong>1. Generate SSH Key</strong></p>
                 <div class="command-box" style="margin-top: 10px;">
