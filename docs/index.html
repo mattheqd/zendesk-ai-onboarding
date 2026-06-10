@@ -526,10 +526,12 @@
                 </div>
                 <p style="margin-top: 15px;">Then inside Claude Code, type:</p>
                 <div class="command-box" style="margin-top: 10px;">
+                    <button class="copy-btn" onclick="copyMarketplaceAdd()">Copy</button>
                     <code>/plugin marketplace add zendesk/claude-code-marketplace</code>
                 </div>
                 <p style="margin-top: 15px;">Install plugins like the article writer:</p>
                 <div class="command-box" style="margin-top: 10px;">
+                    <button class="copy-btn" onclick="copyPluginInstall()">Copy</button>
                     <code>/plugin install zendeskdev-article-writer</code>
                 </div>
                 <p style="margin-top: 15px;"><strong>Note:</strong> The marketplace works with your GitHub authentication from the setup. If you have SSH keys, the wizard will help you authorize them for the Zendesk org. Otherwise, it uses HTTPS automatically.</p>
@@ -650,24 +652,34 @@
             copyToClipboard(command, 1);
         }
 
+        function copyMarketplaceAdd() {
+            const command = '/plugin marketplace add zendesk/claude-code-marketplace';
+            copyToClipboard(command, 2);
+        }
+
+        function copyPluginInstall() {
+            const command = '/plugin install zendeskdev-article-writer';
+            copyToClipboard(command, 3);
+        }
+
         function copySSHKeygen() {
             const command = 'ssh-keygen -t ed25519 -C "your_email@example.com"';
-            copyToClipboard(command, 2);
+            copyToClipboard(command, 4);
         }
 
         function copySSHAgent() {
             const command = 'eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519';
-            copyToClipboard(command, 3);
+            copyToClipboard(command, 5);
         }
 
         function copySSHCat() {
             const command = 'cat ~/.ssh/id_ed25519.pub';
-            copyToClipboard(command, 4);
+            copyToClipboard(command, 6);
         }
 
         function copySSHTest() {
             const command = 'ssh -T git@github.com';
-            copyToClipboard(command, 5);
+            copyToClipboard(command, 7);
         }
 
         function copyToClipboard(text, btnIndex) {
