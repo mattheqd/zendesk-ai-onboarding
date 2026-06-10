@@ -79,7 +79,7 @@ bash preflight.sh && bash install.sh
 
 ### GitHub Access
 **If you see warnings about GitHub access:**
-1. Ping your manager or **#it-help** on Slack
+1. Request access via **Okta Zendesk Hub → Productiv**
 2. Ask to be added to the **Zendesk GitHub organization**
 3. This takes ~15 minutes if you ask today, 2 days if you wait
 
@@ -193,7 +193,7 @@ curl -I https://ai-gateway.zende.sk
 - Ask the workshop organizers for help
 
 **Before the workshop:**
-- For GitHub access: Ping **#it-help** on Slack
+- For GitHub access: Request via **Okta Zendesk Hub → Productiv**
 - For VPN issues: Contact IT
 - For script issues: Contact the workshop organizers
 
@@ -213,4 +213,4 @@ curl -I https://ai-gateway.zende.sk
 
 - 🔑 Get AI Gateway token: https://ai-gateway.zende.sk
 - 🐙 Zendesk GitHub org: https://github.com/zendesk
-- 💬 IT support: #it-help on Slack
+- 💬 GitHub access: Okta Zendesk Hub → Productiv

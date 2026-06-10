@@ -441,11 +441,13 @@
 
                 <p style="margin-top: 25px;"><strong>2. Get GitHub access</strong></p>
                 <p>If you're not already in the <strong>zendesk GitHub org</strong>, you need access before the workshop. Request access as early as possible—it can take time depending on IT's queue.</p>
-                <p style="margin-top: 15px;"><strong>Action:</strong> Ping <strong>#it-help</strong> on Slack:</p>
-                <div class="command-box" style="margin-top: 15px;">
-                    <button class="copy-btn" onclick="copySlackMessage()">Copy</button>
-                    <code id="slack-message">"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"</code>
-                </div>
+                <p style="margin-top: 15px;"><strong>Action:</strong> Request access via <strong>Okta Zendesk Hub</strong>:</p>
+                <ol style="margin: 15px 0 0 25px; color: #4b5563; line-height: 1.8;">
+                    <li>Log into Okta and open <strong>Zendesk Hub</strong></li>
+                    <li>Navigate to <strong>Productiv</strong></li>
+                    <li>Request access to the <strong>Zendesk GitHub organization</strong></li>
+                    <li>Include your GitHub username in the request</li>
+                </ol>
             </div>
 
             <div class="step">
@@ -551,7 +553,7 @@
 
                 <div class="trouble-item">
                     <strong>"Not a member of zendesk org"</strong>
-                    <p>Ping #it-help on Slack to request access. The sooner you ask, the better.</p>
+                    <p>Request access via Okta Zendesk Hub → Productiv. Include your GitHub username in the request.</p>
                 </div>
 
                 <div class="trouble-item">
@@ -577,7 +579,7 @@
 
         <div class="footer">
             <p><strong>Need help?</strong></p>
-            <p>Ping <strong>#it-help</strong> on Slack or contact the workshop organizers</p>
+            <p>Request access via <strong>Okta Zendesk Hub → Productiv</strong> or contact the workshop organizers</p>
             <p style="margin-top: 20px;">
                 <a href="https://github.com/mattheqd/zendesk-ai-onboarding" target="_blank">GitHub Repo</a> •
                 <a href="https://ai-gateway.zende.sk" target="_blank">AI Gateway</a>
@@ -591,14 +593,9 @@
             copyToClipboard(command, 0);
         }
 
-        function copySlackMessage() {
-            const message = '"Hi! I need to be added to the Zendesk GitHub organization for the Claude Code workshop. My GitHub username is [YOUR_GITHUB_USERNAME]"';
-            copyToClipboard(message, 1);
-        }
-
         function copyMarketplace() {
             const command = 'claude';
-            copyToClipboard(command, 2);
+            copyToClipboard(command, 1);
         }
 
         function copyToClipboard(text, btnIndex) {
