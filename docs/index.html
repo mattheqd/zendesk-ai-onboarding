@@ -572,6 +572,53 @@
                 </div>
             </div>
 
+            <div class="setup-box" style="margin-top: 60px;">
+                <h3>Manual SSH Key Setup (Advanced)</h3>
+                <p>If you need to manually configure SSH keys for GitHub (most users won't need this):</p>
+
+                <p style="margin-top: 25px;"><strong>1. Generate SSH Key</strong></p>
+                <div class="command-box" style="margin-top: 10px;">
+                    <button class="copy-btn" onclick="copySSHKeygen()">Copy</button>
+                    <code>ssh-keygen -t ed25519 -C "your_email@example.com"</code>
+                </div>
+                <p style="margin-top: 10px;">Press Enter through all prompts to accept defaults.</p>
+
+                <p style="margin-top: 25px;"><strong>2. Start SSH Agent and Add Key</strong></p>
+                <div class="command-box" style="margin-top: 10px;">
+                    <button class="copy-btn" onclick="copySSHAgent()">Copy</button>
+                    <code>eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519</code>
+                </div>
+
+                <p style="margin-top: 25px;"><strong>3. Copy Public Key</strong></p>
+                <div class="command-box" style="margin-top: 10px;">
+                    <button class="copy-btn" onclick="copySSHCat()">Copy</button>
+                    <code>cat ~/.ssh/id_ed25519.pub</code>
+                </div>
+                <p style="margin-top: 10px;">This will display your public key. Copy the entire output.</p>
+
+                <p style="margin-top: 25px;"><strong>4. Add Key to GitHub</strong></p>
+                <ol style="margin: 10px 0 0 25px; color: #4b5563; line-height: 1.8;">
+                    <li>Go to <a href="https://github.com/settings/keys" target="_blank">GitHub → Settings → SSH and GPG keys</a></li>
+                    <li>Click <strong>New SSH key</strong></li>
+                    <li>Paste your public key and give it a title (e.g., "Work Laptop")</li>
+                    <li>Click <strong>Add SSH key</strong></li>
+                </ol>
+
+                <p style="margin-top: 25px;"><strong>5. Enable SSO for Zendesk</strong></p>
+                <ol style="margin: 10px 0 0 25px; color: #4b5563; line-height: 1.8;">
+                    <li>On the same SSH keys page, find your newly added key</li>
+                    <li>Click <strong>Configure SSO</strong> button next to it</li>
+                    <li>Click <strong>Authorize</strong> for the "zendesk" organization</li>
+                </ol>
+
+                <p style="margin-top: 25px;"><strong>6. Test SSH Connection</strong></p>
+                <div class="command-box" style="margin-top: 10px;">
+                    <button class="copy-btn" onclick="copySSHTest()">Copy</button>
+                    <code>ssh -T git@github.com</code>
+                </div>
+                <p style="margin-top: 10px;">You should see: "Hi [username]! You've successfully authenticated..."</p>
+            </div>
+
             <div style="text-align: left; margin: 60px 0;">
                 <a href="https://github.com/mattheqd/zendesk-ai-onboarding" class="btn" target="_blank">View on GitHub</a>
             </div>
@@ -596,6 +643,26 @@
         function copyMarketplace() {
             const command = 'claude';
             copyToClipboard(command, 1);
+        }
+
+        function copySSHKeygen() {
+            const command = 'ssh-keygen -t ed25519 -C "your_email@example.com"';
+            copyToClipboard(command, 2);
+        }
+
+        function copySSHAgent() {
+            const command = 'eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519';
+            copyToClipboard(command, 3);
+        }
+
+        function copySSHCat() {
+            const command = 'cat ~/.ssh/id_ed25519.pub';
+            copyToClipboard(command, 4);
+        }
+
+        function copySSHTest() {
+            const command = 'ssh -T git@github.com';
+            copyToClipboard(command, 5);
         }
 
         function copyToClipboard(text, btnIndex) {
