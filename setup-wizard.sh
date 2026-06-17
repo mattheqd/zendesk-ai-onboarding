@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 
 # Wizard state
 STEP=1
-TOTAL_STEPS=6
+TOTAL_STEPS=7
 
 # Track status
 ALL_CHECKS_PASSED=true
@@ -67,6 +67,7 @@ step_welcome() {
     echo "  3. Set up your AI Gateway token"
     echo "  4. Install required tools (Homebrew, Node, VS Code, etc.)"
     echo "  5. Install Claude Code"
+    echo "  6. Install Figma MCP plugin (for designers)"
     echo ""
     echo "Time needed: About 10 minutes"
     echo ""
@@ -673,7 +674,155 @@ EOF
     ((STEP++))
 }
 
-# Step 7: Final Check
+# Step 7: Install Figma MCP
+step_install_figma() {
+    show_header
+    show_step "🎨 Installing Figma MCP Server"
+
+    # Check if Claude Code is installed
+    if ! command -v claude &> /dev/null; then
+        echo -e "${RED}✗ Claude Code not found - skipping Figma MCP${NC}"
+        echo "  → Install Claude Code first"
+        echo ""
+        press_to_continue
+        ((STEP++))
+        return
+    fi
+
+    # Use explicit path to Claude binary
+    CLAUDE_BIN="$HOME/.local/bin/claude"
+
+    if [ ! -f "$CLAUDE_BIN" ]; then
+        CLAUDE_BIN="claude"
+    fi
+
+    # Check if Figma MCP already exists FIRST (direct server only, not plugin)
+    if "$CLAUDE_BIN" mcp list 2>&1 | grep -Eq "^figma:"; then
+        echo -e "${GREEN}✓ Figma MCP server already installed!${NC}"
+        echo ""
+        echo "Skipping installation and authentication steps."
+        echo ""
+        press_to_continue
+        ((STEP++))
+        return
+    fi
+
+    # Figma not installed, ask user if they want it
+    echo "The Figma MCP server lets Claude Code interact with Figma designs."
+    echo "This is especially useful for designers working with components and design systems."
+    echo ""
+
+    # Ask if they want to install it
+    read -p "Install Figma MCP server? (Y/n): " -n 1 -r
+    echo ""
+
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        echo "Skipping Figma MCP installation."
+        echo "  → You can install it later with:"
+        echo -e "    ${BLUE}claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp${NC}"
+        echo ""
+        press_to_continue
+        ((STEP++))
+        return
+    fi
+
+    # Figma MCP not found, proceed with installation
+    echo "Installing Figma MCP server with user scope..."
+    echo "(This makes it available across all your projects)"
+    echo ""
+
+    # Try to install Figma MCP server
+    INSTALL_OUTPUT=$("$CLAUDE_BIN" mcp add --scope user --transport http figma https://mcp.figma.com/mcp 2>&1)
+    INSTALL_EXIT=$?
+
+    # Check if it succeeded OR already exists
+    if [ $INSTALL_EXIT -eq 0 ] || echo "$INSTALL_OUTPUT" | grep -q "already exists"; then
+        echo ""
+        echo -e "${GREEN}✓ Figma MCP server installed!${NC}"
+        echo ""
+    else
+        echo ""
+        echo -e "${YELLOW}⚠ Figma MCP installation failed (exit code: $INSTALL_EXIT)${NC}"
+        echo ""
+        echo "  This is optional - setup will continue."
+        echo "  You can install it manually later:"
+        echo -e "    ${BLUE}claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp${NC}"
+        echo ""
+        INSTALL_SUCCESS=false
+        FAILED_INSTALLS+=("Figma MCP server")
+
+        echo ""
+        press_to_continue
+        ((STEP++))
+        return
+    fi
+
+    # MCP server is installed, now handle authentication
+    echo ""
+    echo -e "${YELLOW}⚠ One more step: Authentication${NC}"
+    echo ""
+    echo "Figma MCP requires OAuth authentication (like GitHub login)."
+    echo "This is a one-time setup that takes ~30 seconds."
+    echo ""
+    read -p "Authenticate now? (Y/n): " -n 1 -r
+    echo ""
+
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        echo ""
+        echo -e "${BLUE}📝 Quick steps after Claude opens:${NC}"
+        echo -e "  1. Type: ${BLUE}/mcp${NC} and press Enter"
+        echo -e "  2. Select 'figma' from the list"
+        echo -e "  3. Choose 'Authenticate'"
+        echo -e "  4. Click 'Allow Access' in your browser"
+        echo -e "  5. Type 'exit' to return to this wizard"
+        echo ""
+        echo "Press Enter to open Claude Code..."
+        read
+
+        # Open Claude Code
+        # Note: This will block until user exits Claude
+        "$CLAUDE_BIN" || true
+
+        echo ""
+        echo -e "${GREEN}✓ Returned from Claude Code${NC}"
+        echo ""
+
+        # Check if authentication succeeded
+        if "$CLAUDE_BIN" mcp get figma 2>&1 | grep -q "Needs authentication"; then
+            echo -e "${YELLOW}⚠ Figma still needs authentication${NC}"
+            echo "  You can complete this anytime by running:"
+            echo -e "    ${BLUE}claude${NC}"
+            echo -e "    ${BLUE}/mcp${NC} → select figma → Authenticate"
+            echo ""
+        else
+            echo -e "${GREEN}✓ Figma MCP is authenticated and ready!${NC}"
+            echo ""
+        fi
+    else
+        echo ""
+        echo "No problem! You can authenticate later:"
+        echo "  1. Run: ${BLUE}claude${NC}"
+        echo "  2. Type: ${BLUE}/mcp${NC}"
+        echo "  3. Select 'figma' → 'Authenticate'"
+        echo ""
+    fi
+
+    echo "Once authenticated, you can:"
+    echo "  • Generate Figma designs from code"
+    echo "  • Read Figma component metadata"
+    echo "  • Sync code with design systems"
+    echo ""
+    echo -e "${BLUE}Example usage:${NC}"
+    echo "  'Create a login screen in Figma'"
+    echo "  'Get the design tokens from this Figma file'"
+    echo ""
+
+    echo ""
+    press_to_continue
+    ((STEP++))
+}
+
+# Step 8: Final Check
 step_final_check() {
     show_header
     show_step "✅ Final Check"
@@ -762,6 +911,7 @@ main() {
     step_token_setup
     step_install_tools
     step_install_claude
+    step_install_figma
     step_final_check
 }
 
