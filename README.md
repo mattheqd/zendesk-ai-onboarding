@@ -7,7 +7,7 @@ Automated setup scripts to get Zendesk designers ready for the Claude Code works
 **Copy and paste this into Terminal:**
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/zendesk/designer-ai-onboarding/main/setup-wizard.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)
 ```
 
 Make sure **GlobalProtect VPN is connected** first!
@@ -19,7 +19,7 @@ Make sure **GlobalProtect VPN is connected** first!
 **Or download and run locally:**
 
 ```bash
-curl -O https://raw.githubusercontent.com/zendesk/designer-ai-onboarding/main/setup-wizard.sh
+curl -O https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh
 bash setup-wizard.sh
 ```
 
