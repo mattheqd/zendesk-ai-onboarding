@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zendesk Claude Code Workshop - Setup</title>
+    <title>Zendesk Claude Code - Setup</title>
     <style>
         * {
             margin: 0;
@@ -416,16 +416,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="badge">WORKSHOP</div>
+            <div class="badge">SETUP</div>
             <h1>Claude Code<br>setup.</h1>
-            <p>Get your Mac ready for the workshop. Run one command, wait ~10 minutes. You'll have Claude Code running on your machine, authenticated to Zendesk's AI Gateway.</p>
+            <p>Get your Mac ready for Claude Code. Run one command, wait ~10 minutes. You'll have Claude Code running on your machine, authenticated to Zendesk's AI Gateway.</p>
         </div>
 
         <div class="content">
             <div class="section">
-                <div class="section-label">Before the Workshop</div>
+                <div class="section-label">Getting Started</div>
                 <h2>Don't skip this page.</h2>
-                <p>The workshop is hands-on. If your laptop isn't set up, you'll spend the session watching someone else type. Ten minutes today. Skip nothing.</p>
+                <p>Claude Code runs locally on your machine. Getting it set up properly takes a few prerequisites. Ten minutes now saves hours later. Skip nothing.</p>
             </div>
 
             <div class="setup-box">
@@ -440,7 +440,7 @@
                 <p>The AI Gateway and all internal Zendesk services are behind the corporate network. If GlobalProtect is off, the setup will fail. Connect to VPN before running the command below.</p>
 
                 <p style="margin-top: 25px;"><strong>2. Get GitHub access</strong></p>
-                <p>If you're not already in the <strong>zendesk GitHub org</strong>, you need access before the workshop. Request access as early as possible—it can take time depending on IT's queue.</p>
+                <p>If you're not already in the <strong>zendesk GitHub org</strong>, you need access to install internal plugins and access Zendesk repositories. Request access as early as possible—it can take time depending on IT's queue.</p>
                 <p style="margin-top: 15px;"><strong>Action:</strong> Request access via <strong>Okta Zendesk Hub</strong>:</p>
                 <ol style="margin: 15px 0 0 25px; color: #4b5563; line-height: 1.8;">
                     <li>Log into Okta and open <strong>Zendesk Hub</strong></li>
@@ -499,7 +499,7 @@
                     <div class="timeline-badge">TOOL</div>
                     <div class="timeline-content">
                         <strong>VS Code</strong>
-                        <p>Code editor for the workshop</p>
+                        <p>Code editor</p>
                     </div>
                 </div>
                 <div class="timeline-item">
@@ -517,25 +517,6 @@
                 <strong>Note:</strong> If you already have some tools installed, the wizard will skip them</p>
             </div>
 
-            <div class="setup-box">
-                <h3>After Setup: Add the Zendesk Marketplace</h3>
-                <p>Once setup is complete, you can install Zendesk-specific plugins from the internal marketplace. Open a <strong>new</strong> terminal and run:</p>
-                <div class="command-box" style="margin-top: 15px;">
-                    <button class="copy-btn" onclick="copyMarketplace()">Copy</button>
-                    <code id="marketplace-command">claude</code>
-                </div>
-                <p style="margin-top: 15px;">Then inside Claude Code, type:</p>
-                <div class="command-box" style="margin-top: 10px;">
-                    <button class="copy-btn" onclick="copyMarketplaceAdd()">Copy</button>
-                    <code>/plugin marketplace add zendesk/claude-code-marketplace</code>
-                </div>
-                <p style="margin-top: 15px;">Install plugins like the article writer:</p>
-                <div class="command-box" style="margin-top: 10px;">
-                    <button class="copy-btn" onclick="copyPluginInstall()">Copy</button>
-                    <code>/plugin install zendeskdev-article-writer</code>
-                </div>
-                <p style="margin-top: 15px;"><strong>Note:</strong> The marketplace works with your GitHub authentication from the setup. If you have SSH keys, the wizard will help you authorize them for the Zendesk org. Otherwise, it uses HTTPS automatically.</p>
-            </div>
 
             <div class="section">
                 <div class="section-label">Common Issues</div>
@@ -633,7 +614,7 @@
 
         <div class="footer">
             <p><strong>Need help?</strong></p>
-            <p>Request access via <strong>Okta Zendesk Hub → Productiv</strong> or contact the workshop organizers</p>
+            <p>Request GitHub access via <strong>Okta Zendesk Hub → Productiv</strong></p>
             <p style="margin-top: 20px;">
                 <a href="https://github.com/mattheqd/zendesk-ai-onboarding" target="_blank">GitHub Repo</a> •
                 <a href="https://ai-gateway.zende.sk" target="_blank">AI Gateway</a>
@@ -647,39 +628,24 @@
             copyToClipboard(command, 0);
         }
 
-        function copyMarketplace() {
-            const command = 'claude';
-            copyToClipboard(command, 1);
-        }
-
-        function copyMarketplaceAdd() {
-            const command = '/plugin marketplace add zendesk/claude-code-marketplace';
-            copyToClipboard(command, 2);
-        }
-
-        function copyPluginInstall() {
-            const command = '/plugin install zendeskdev-article-writer';
-            copyToClipboard(command, 3);
-        }
-
         function copySSHKeygen() {
             const command = 'ssh-keygen -t ed25519 -C "your_email@example.com"';
-            copyToClipboard(command, 4);
+            copyToClipboard(command, 1);
         }
 
         function copySSHAgent() {
             const command = 'eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519';
-            copyToClipboard(command, 5);
+            copyToClipboard(command, 2);
         }
 
         function copySSHCat() {
             const command = 'cat ~/.ssh/id_ed25519.pub';
-            copyToClipboard(command, 6);
+            copyToClipboard(command, 3);
         }
 
         function copySSHTest() {
             const command = 'ssh -T git@github.com';
-            copyToClipboard(command, 7);
+            copyToClipboard(command, 4);
         }
 
         function copyToClipboard(text, btnIndex) {

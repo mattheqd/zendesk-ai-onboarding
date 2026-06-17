@@ -40,26 +40,6 @@ The wizard will guide you through:
 
 ---
 
-## 🔧 Advanced: Two-Phase Setup (Alternative)
-
-If you prefer more control, use the two-phase approach:
-
-```bash
-bash preflight.sh && bash install.sh
-```
-
-### Phase 1: preflight.sh (Checks Only)
-- ✓ GlobalProtect VPN connectivity
-- ✓ GitHub CLI + zendesk org membership
-- ✓ AI Gateway token validation
-
-### Phase 2: install.sh (Installations)
-- Homebrew (if missing)
-- Node.js 20+
-- GitHub CLI (gh) + authentication
-- VS Code
-- Claude Code (via AI Gateway)
-
 ---
 
 ## Requirements
@@ -91,8 +71,12 @@ bash preflight.sh && bash install.sh
 - Make sure you're logged in with your Zendesk credentials
 
 ### Marketplace Access
-After setup, add the Zendesk marketplace inside Claude Code:
+The setup wizard automatically configures the Zendesk marketplace during installation.
+
+If marketplace setup was skipped (check wizard output), you can add it manually:
+
 ```bash
+claude
 /plugin marketplace add zendesk/claude-code-marketplace
 ```
 
@@ -104,6 +88,8 @@ If marketplace fails with "permission denied" and you have SSH keys:
 1. Go to https://github.com/settings/keys
 2. Find your SSH key → **Configure SSO** → **Authorize** for "zendesk"
 
+**Note**: The marketplace requires GitHub authentication and SSH/HTTPS access to the Zendesk org.
+
 ### Install Failures
 - Check your internet connection
 - Some tools may require admin approval on first launch
@@ -112,16 +98,6 @@ If marketplace fails with "permission denied" and you have SSH keys:
 ---
 
 ## Manual Testing
-
-### Test with Dry Run (Safe - No Changes)
-```bash
-DRY_RUN=1 bash install.sh
-```
-
-### Test Preflight Only
-```bash
-bash preflight.sh
-```
 
 ### Test Individual Components
 ```bash
@@ -136,14 +112,11 @@ curl -I https://ai-gateway.zende.sk/bedrock/v1/messages \
   -H "Authorization: Bearer zdai_YOUR_TOKEN"
 ```
 
-See [TESTING.md](TESTING.md) for comprehensive testing guide.
-
 ---
 
 ## Time Estimates
 
 - **Interactive Wizard**: ~10 minutes (fully guided)
-- **Two-Phase Setup**: ~10 minutes (more manual)
 - **Manual Setup**: ~45 minutes (what we're replacing!)
 
 ---
@@ -202,10 +175,8 @@ curl -I https://ai-gateway.zende.sk
 ## Files in This Repo
 
 - **`setup-wizard.sh`** - Interactive setup wizard (recommended)
-- **`preflight.sh`** - Validation checks only
-- **`install.sh`** - Installation phase
+- **`docs/`** - Workshop documentation and resources
 - **`README.md`** - This file
-- **`TESTING.md`** - Testing guide for organizers
 
 ---
 

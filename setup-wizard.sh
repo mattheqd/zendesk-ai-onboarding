@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Zendesk Claude Code Workshop - Setup Wizard
+# Zendesk Claude Code - Setup Wizard for Designer AI Enablement
 # One-file interactive installer for designers
 
 set -e
@@ -34,7 +34,7 @@ show_header() {
     echo ""
     echo -e "${CYAN}╔════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║                                                        ║${NC}"
-    echo -e "${CYAN}║     ${BOLD}Zendesk Claude Code Workshop Setup${NC}${CYAN}            ║${NC}"
+    echo -e "${CYAN}║     ${BOLD}Claude Code + Designer AI Tools Setup${NC}${CYAN}        ║${NC}"
     echo -e "${CYAN}║                                                        ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════╝${NC}"
     echo ""
@@ -59,7 +59,7 @@ step_welcome() {
     show_header
     show_step "👋 Welcome!"
 
-    echo "This wizard will get your Mac ready for the Claude Code workshop."
+    echo "This wizard will set up Claude Code and AI utilities for designers."
     echo ""
     echo "What we'll do:"
     echo "  1. Check your VPN connection"
@@ -131,7 +131,7 @@ step_github_check() {
         echo "  2. Ask to be added to the Zendesk GitHub organization"
         echo "  3. This takes ~15 minutes if you ask today, 2 days if you wait"
         echo ""
-        echo "You'll need this to push to internal repos during the workshop."
+        echo "You'll need this to access internal Zendesk repositories."
         echo ""
         press_to_continue
     elif ! gh auth status &> /dev/null; then
@@ -160,7 +160,7 @@ step_github_check() {
         echo "  2. Ask to be added to the Zendesk GitHub organization"
         echo "  3. This takes ~15 minutes if you ask today, 2 days if you wait"
         echo ""
-        echo "You'll need this access to use Claude Code in the workshop."
+        echo "You'll need this access to use Claude Code at Zendesk."
         echo ""
         read -p "Continue anyway? (y/N): " -n 1 -r
         echo ""
@@ -445,65 +445,11 @@ step_install_tools() {
 
             read -p "Press Enter to continue..."
         else
-            # GitHub auth succeeded - check if SSH keys need SSO authorization
+            # GitHub auth succeeded - marketplace will use HTTPS
             echo ""
-            if [ -f ~/.ssh/id_ed25519 ] || [ -f ~/.ssh/id_rsa ]; then
-                echo -e "${BLUE}Detected SSH keys - configuring for Zendesk GitHub...${NC}"
-                echo ""
-
-                # Add GitHub to known_hosts
-                if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
-                    ssh-keyscan -H github.com >> ~/.ssh/known_hosts 2>/dev/null
-                    echo -e "${GREEN}✓ GitHub added to known hosts${NC}"
-                fi
-
-                # Test SSH connection
-                echo "Testing SSH connection to GitHub..."
-                SSH_TEST=$(ssh -T git@github.com 2>&1)
-
-                if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
-                    echo -e "${GREEN}✓ SSH connection works!${NC}"
-                    echo "  Marketplace will use SSH"
-                elif echo "$SSH_TEST" | grep -qi "permission denied\|publickey"; then
-                    echo -e "${YELLOW}⚠ SSH key needs SSO authorization for Zendesk org${NC}"
-                    echo ""
-                    echo "Your SSH key exists but isn't authorized for the Zendesk organization."
-                    echo ""
-                    echo "Quick fix (one-time):"
-                    echo "  1. Go to: ${BLUE}https://github.com/settings/keys${NC}"
-                    echo "  2. Find your SSH key"
-                    echo "  3. Click ${BLUE}Configure SSO${NC} button next to it"
-                    echo "  4. Click ${BLUE}Authorize${NC} for the 'zendesk' organization"
-                    echo ""
-
-                    read -p "Open GitHub settings now? (Y/n): " -n 1 -r
-                    echo ""
-                    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-                        open "https://github.com/settings/keys" 2>/dev/null || true
-                        echo "Browser opened. Please authorize your SSH key."
-                    fi
-
-                    echo ""
-                    read -p "Press Enter after authorizing the key (or skip for now)..."
-
-                    # Re-test SSH connection
-                    echo ""
-                    echo "Re-testing SSH connection..."
-                    SSH_TEST=$(ssh -T git@github.com 2>&1)
-
-                    if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
-                        echo -e "${GREEN}✓ SSH authorized! Marketplace will work.${NC}"
-                    else
-                        echo -e "${YELLOW}⚠ SSH still not working${NC}"
-                        echo "  → No worries! Marketplace will use HTTPS instead"
-                        echo "  → Everything will still work with your GitHub login"
-                    fi
-                fi
-                echo ""
-            else
-                echo -e "${GREEN}✓ No SSH keys detected - marketplace will use HTTPS${NC}"
-                echo ""
-            fi
+            echo -e "${GREEN}✓ GitHub authentication successful!${NC}"
+            echo "  → Marketplace will use HTTPS with your GitHub login"
+            echo ""
         fi
     fi
 
@@ -574,6 +520,70 @@ EOF
                 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
                 export PATH="$HOME/.local/bin:$PATH"
             fi
+
+            # === MARKETPLACE SETUP ===
+            echo ""
+            echo -e "${BLUE}🏪 Setting up Zendesk Marketplace...${NC}"
+            echo ""
+
+            # Source shell config to pick up PATH changes
+            if [ -f ~/.zshrc ]; then
+                source ~/.zshrc 2>/dev/null || true
+            fi
+
+            # Use explicit path to Claude binary
+            CLAUDE_BIN="$HOME/.local/bin/claude"
+
+            # Check if marketplace is already configured
+            if [ -f ~/.claude/plugins/known_marketplaces.json ] && grep -q "zendesk" ~/.claude/plugins/known_marketplaces.json 2>/dev/null; then
+                echo -e "${GREEN}✓ Zendesk Marketplace already configured!${NC}"
+                echo "  → You can install plugins when you open Claude in your terminal like:"
+                echo -e "    ${BLUE}/plugin install zendeskdev-article-writer${NC}"
+                echo ""
+            elif [ ! -f "$CLAUDE_BIN" ]; then
+                echo "  The marketplace provides Zendesk-specific plugins."
+                echo "  This is optional - we'll continue if it fails."
+                echo ""
+                echo -e "${YELLOW}⚠ Claude binary not found yet - skipping marketplace${NC}"
+                echo "  → You can add it manually after opening a new terminal"
+                echo ""
+            elif ! command -v gh &> /dev/null || ! gh auth status &> /dev/null 2>&1 || ! gh api /user/orgs --jq '.[].login' 2>/dev/null | grep -q "^zendesk$"; then
+                echo "  The marketplace provides Zendesk-specific plugins."
+                echo "  This is optional - we'll continue if it fails."
+                echo ""
+                echo -e "${YELLOW}⚠ GitHub not authenticated or not in zendesk org - skipping marketplace${NC}"
+                echo "  → Authenticate with 'gh auth login' and join zendesk org, then add marketplace manually"
+                echo ""
+            else
+                echo "  The marketplace provides Zendesk-specific plugins."
+                echo "  This is optional - we'll continue if it fails."
+                echo ""
+                # Try to add marketplace
+                echo "  Adding zendesk/claude-code-marketplace..."
+
+                # Set GIT_CONFIG_COUNT to force HTTPS for this command only (doesn't affect global config)
+                if GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="url.https://github.com/.insteadOf" GIT_CONFIG_VALUE_0="git@github.com:" "$CLAUDE_BIN" plugin marketplace add zendesk/claude-code-marketplace 2>&1; then
+                    echo ""
+                    echo -e "${GREEN}✓ Marketplace added successfully!${NC}"
+                    echo "  → You can now install plugins when you open Claude in your terminal like:"
+                    echo -e "    ${BLUE}/plugin install zendeskdev-article-writer${NC}"
+                    echo ""
+                else
+                    MARKETPLACE_EXIT=$?
+                    echo ""
+                    echo -e "${YELLOW}⚠ Marketplace setup skipped (exit code: $MARKETPLACE_EXIT)${NC}"
+                    echo ""
+                    echo "  Common reasons:"
+                    echo "    • Network timeout or VPN issues"
+                    echo "    • Repository access permissions"
+                    echo ""
+                    echo "  You can add it manually later:"
+                    echo -e "    ${BLUE}claude${NC}"
+                    echo -e "    ${BLUE}/plugin marketplace add zendesk/claude-code-marketplace${NC}"
+                    echo ""
+                fi
+            fi
+            # === END MARKETPLACE SETUP ===
         else
             echo ""
             echo -e "${RED}✗ Claude Code installation failed${NC}"
@@ -607,6 +617,55 @@ EOF
                 echo "  Keeping your existing token"
             fi
         fi
+
+        # === MARKETPLACE SETUP (for existing Claude) ===
+        echo ""
+        echo -e "${BLUE}🏪 Checking Zendesk Marketplace...${NC}"
+        echo ""
+
+        # Check if marketplace is already configured
+        if [ -f ~/.claude/plugins/known_marketplaces.json ] && grep -q "zendesk" ~/.claude/plugins/known_marketplaces.json 2>/dev/null; then
+            echo -e "${GREEN}✓ Zendesk Marketplace already configured!${NC}"
+            echo "  → You can install plugins when you open Claude in your terminal like:"
+            echo -e "    ${BLUE}/plugin install zendeskdev-article-writer${NC}"
+            echo ""
+        elif ! command -v gh &> /dev/null || ! gh auth status &> /dev/null 2>&1 || ! gh api /user/orgs --jq '.[].login' 2>/dev/null | grep -q "^zendesk$"; then
+            echo "  The marketplace provides Zendesk-specific plugins."
+            echo "  This is optional - we'll continue if it fails."
+            echo ""
+            echo -e "${YELLOW}⚠ GitHub not authenticated or not in zendesk org - skipping marketplace${NC}"
+            echo "  → Authenticate with 'gh auth login' and join zendesk org, then add marketplace manually"
+            echo ""
+        else
+            echo "  The marketplace provides Zendesk-specific plugins."
+            echo "  This is optional - we'll continue if it fails."
+            echo ""
+            # Try to add marketplace
+            echo "  Adding zendesk/claude-code-marketplace..."
+
+            # Set GIT_CONFIG_COUNT to force HTTPS for this command only (doesn't affect global config)
+            if GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="url.https://github.com/.insteadOf" GIT_CONFIG_VALUE_0="git@github.com:" claude plugin marketplace add zendesk/claude-code-marketplace 2>&1; then
+                echo ""
+                echo -e "${GREEN}✓ Marketplace added successfully!${NC}"
+                echo "  → You can now install plugins when you open Claude in your terminal like:"
+                echo -e "    ${BLUE}/plugin install zendeskdev-article-writer${NC}"
+                echo ""
+            else
+                MARKETPLACE_EXIT=$?
+                echo ""
+                echo -e "${YELLOW}⚠ Marketplace setup skipped (exit code: $MARKETPLACE_EXIT)${NC}"
+                echo ""
+                echo "  Common reasons:"
+                echo "    • Network timeout or VPN issues"
+                echo "    • Repository access permissions"
+                echo ""
+                echo "  You can add it manually later:"
+                echo -e "    ${BLUE}claude${NC}"
+                echo -e "    ${BLUE}/plugin marketplace add zendesk/claude-code-marketplace${NC}"
+                echo ""
+            fi
+        fi
+        # === END MARKETPLACE SETUP ===
     fi
 
     echo ""
@@ -654,19 +713,27 @@ step_final_check() {
         INSTALL_SUCCESS=false
     fi
 
+    # Check marketplace configuration (optional)
+    if [ -f ~/.claude/plugins/known_marketplaces.json ] && grep -q "zendesk" ~/.claude/plugins/known_marketplaces.json 2>/dev/null; then
+        echo -e "${GREEN}✓ Zendesk Marketplace configured${NC}"
+    else
+        echo -e "${YELLOW}⚠ Zendesk Marketplace not configured (optional)${NC}"
+        echo -e "  → You can add it later with: ${BLUE}claude plugin marketplace add zendesk/claude-code-marketplace${NC}"
+    fi
+
     echo ""
 
     # Clean up token file
     rm -f "$TOKEN_FILE"
 
     if [ "$INSTALL_SUCCESS" = true ]; then
-        echo -e "${GREEN}${BOLD}🎉 All set! You're ready for the workshop!${NC}"
+        echo -e "${GREEN}${BOLD}🎉 All set! You're ready to use Claude Code!${NC}"
         echo ""
         echo "Quick start:"
         echo -e "  ${BLUE}1. Open a new terminal (to load updated PATH)${NC}"
         echo -e "  ${BLUE}2. Run: claude${NC}"
         echo ""
-        echo "See you at the workshop!"
+        echo "Happy building with AI! 🚀"
     else
         echo -e "${RED}${BOLD}⚠️  Some installations failed${NC}"
         echo ""
@@ -680,7 +747,7 @@ step_final_check() {
         echo "  • Make sure you have enough disk space"
         echo "  • Try running the wizard again"
         echo ""
-        echo "If problems persist, contact the workshop organizers with"
+        echo "If problems persist, contact your team lead with"
         echo "the specific error messages shown above."
     fi
 
