@@ -2,43 +2,25 @@
 
 Automated setup scripts to get Zendesk designers ready for the Claude Code workshop in ~10 minutes.
 
-## 🚀 Quick Start (One-Line Setup)
+## 🚀 Quick Start
 
-**Copy and paste this into Terminal:**
+**Step 1:** Download [setup-wizard.sh](https://github.com/zendesk/designer-ai-onboarding/releases/latest/download/setup-wizard.sh)
 
+**Step 2:** Open Terminal and run:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)
+bash ~/Downloads/setup-wizard.sh
 ```
 
 Make sure **GlobalProtect VPN is connected** first!
 
----
-
-## 🧙 Interactive Setup Wizard (Recommended)
-
-**Or download and run locally:**
-
-```bash
-curl -O https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh
-bash setup-wizard.sh
-```
-
-The wizard will guide you through:
+**What the wizard does:**
 1. ✓ VPN connection check
 2. ✓ GitHub access verification
 3. ✓ AI Gateway token setup (opens browser for you!)
 4. ✓ Tool installation (Homebrew, Node, VS Code, etc.)
 5. ✓ Claude Code installation
-6. ✓ Final verification
-
-**Features:**
-- 🎨 Clean, designer-friendly interface
-- ↩️ Retry options if something fails
-- 🌐 Opens browser to get your token
-- 📋 Clear instructions for GitHub access
-- ✅ Validates everything at the end
-
----
+6. ✓ Figma MCP installation (optional)
+7. ✓ Final verification
 
 ---
 

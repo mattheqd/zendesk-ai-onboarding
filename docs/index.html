@@ -450,18 +450,23 @@
                 </ol>
             </div>
 
-            <div class="step">
-                <span class="step-number">§</span>
+            <div class="setup-box">
                 <h3>Quick Setup</h3>
-                <div class="step-content">
-                    <p>Once VPN is connected, open <strong>Terminal</strong> (Cmd+Space, type "Terminal", hit Return) and paste:</p>
-                    <div class="command-box">
-                        <button class="copy-btn" onclick="copyCommand()">Copy</button>
-                        <code id="setup-command">bash &lt;(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)</code>
-                    </div>
-                    <p>The wizard will guide you through the rest.</p>
-                    <p style="margin-top: 15px;"><strong>Note:</strong> You may be asked for your Mac password during setup. When you type it, nothing will appear on screen (not even dots) — this is normal security behavior. Just type your password and press Enter.</p>
+
+                <p style="margin-top: 20px;"><strong>Step 1:</strong> Download the setup script</p>
+                <div style="margin: 15px 0;">
+                    <a href="https://github.com/zendesk/designer-ai-onboarding/releases/latest/download/setup-wizard.sh" class="btn btn-secondary">
+                        📥 Download setup-wizard.sh
+                    </a>
                 </div>
+
+                <p style="margin-top: 25px;"><strong>Step 2:</strong> Open Terminal and run:</p>
+                <div class="command-box">
+                    <button class="copy-btn" onclick="copyCommand()">Copy</button>
+                    <code id="setup-command">bash ~/Downloads/setup-wizard.sh</code>
+                </div>
+
+                <p style="margin-top: 15px;"><strong>Note:</strong> You may be asked for your Mac password during setup. When you type it, nothing will appear on screen (not even dots) — this is normal security behavior. Just type your password and press Enter.</p>
             </div>
 
 
@@ -624,7 +629,7 @@
 
     <script>
         function copyCommand() {
-            const command = 'bash <(curl -fsSL https://raw.githubusercontent.com/mattheqd/zendesk-ai-onboarding/main/setup-wizard.sh)';
+            const command = 'bash ~/Downloads/setup-wizard.sh';
             copyToClipboard(command, 0);
         }
 
